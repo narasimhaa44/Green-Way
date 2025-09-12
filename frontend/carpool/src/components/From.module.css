@@ -1,0 +1,207 @@
+.outer {
+  background: linear-gradient(135deg, #f0f4f8, #e9f0ff);
+  min-height: 100vh;
+  padding: 60px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inner {
+  display: flex;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  overflow: hidden;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.left {
+  flex: 1 1 600px;
+  padding: 40px;
+  background: #f9fbff;
+}
+
+.right {
+  flex: 1 1 400px;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.find {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 200px;
+  object-fit: contain;
+}
+
+.cardheader {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.cardicon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: #e0e7ff;
+  color: #4f46e5;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+}
+
+.cardheader h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.cardheader p {
+  font-size: 14px;
+  color: #777;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.icon {
+  margin-right: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.2s border-color ease;
+}
+
+.input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+.suggestions li {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.suggestions li:hover {
+  background-color: #f1f5f9;
+}
+
+.button {
+  grid-column: 1 / -1;
+  background-color: #4f46e5;
+  color: #fff;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.button:hover {
+  background-color: #4338ca;
+}
+
+.input[type="datetime-local"] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 16px;
+  color: #333;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .inner {
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .left, .right {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .find {
+    max-width: 300px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardheader h2 {
+    font-size: 18px;
+  }
+
+  .cardicon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .input {
+    font-size: 14px;
+  }
+
+  .button {
+    font-size: 14px;
+  }
+
+  .find {
+    max-width: 260px;
+    border-radius: 300px;
+  }
+}

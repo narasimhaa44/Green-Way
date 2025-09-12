@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap');
+
+.logo {
+  height: 60px;
+  width: 250px;
+  margin: 20px auto;
+
+}
+
+.outer {
+  max-width: 500px;      /* max size for large screens */
+  width: 90%;            /* shrink for small screens */
+  background-color: rgb(225, 228, 227);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: 70px auto;     /* center horizontally */
+  padding: 20px;         /* spacing inside */
+}
+
+.para {
+  margin: 10px 0 20px;
+  font-family: "Nata Sans", sans-serif;
+  font-weight: 300;
+  font-size: 24px;
+  text-align: center;    /* center for mobile */
+}
+
+.btn {
+  border-radius: 10px;
+  width: 100%;           /* full width inside parent */
+  max-width: 400px;
+  height: 50px;
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: white;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-family: "Nata Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.google {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+
+.btn span {
+  font-size: 16px;
+  color: #333;
+}
+
+.form p {
+  font-size: 16px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.input {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  margin: 20px auto;
+}
+
+.input input {
+  margin: 8px 0;
+  border-radius: 5px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.btn1 {
+  width: 100%;
+  max-width: 380px;
+  margin: 20px auto;
+  border-radius: 10px;
+  background-color: black;
+  color: white;
+  height: 50px;
+  font-family: "Nata Sans", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left:35px;
+}
+
+/* 📱 Responsive tweaks for small screens */
+@media (max-width: 600px) {
+  .para {
+    font-size: 20px;
+  }
+
+  .btn,
+  .btn1 {
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .google {
+    width: 20px;
+    height: 20px;
+  }
+}

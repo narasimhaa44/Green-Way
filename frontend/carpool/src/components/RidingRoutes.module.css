@@ -1,0 +1,411 @@
+/* Main container */
+.main {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #ffffff 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.left {
+  flex: 1;
+  padding: 20px;
+  margin:20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.right {
+  width: 400px;
+  margin-top:90px;
+  /* background: rgba(255, 255, 255, 0.95); */
+  /* backdrop-filter: blur(20px); */
+  /* border-radius: 20px 0 0 20px; */
+  /* box-shadow: -10px 0 30px rgba(33, 150, 243, 0.2); */
+  display: flex;
+  flex-direction: column;
+  /* border-left: 3px solid #ffffff; */
+}
+
+/* Map section */
+.mapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 15px 25px;
+  border-radius: 15px;
+  border: 2px solid #f3f3f3;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.heading {
+  color: #434547;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(124, 129, 134, 0.2);
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusIndicator {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  background: #3cae3a;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 10px rgba(57, 194, 70, 0.5);
+}
+
+.pulse {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #37b94a;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.statusText {
+  color: #3d3d3d;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 3px rgba(33, 150, 243, 0.2);
+}
+
+.mapContainer {
+  position: relative;
+  flex: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(122, 117, 117, 0.3);
+  border: 3px solid #ffffff;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(118, 113, 113, 0.2);
+  border: 2px solid #e3f2fd;
+}
+
+.coordinates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coordItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coordLabel {
+  font-weight: 600;
+  color: #2b2c2e;
+  font-size: 0.9rem;
+  min-width: 35px;
+}
+
+.coordValue {
+  font-family: 'Monaco', 'Consolas', monospace;
+  background: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #656060;
+  border: 1px solid #bbdefb;
+}
+
+/* Animated line for map */
+.animatedLine {
+  stroke-dasharray: 10 5;
+  stroke-dashoffset: 0; 
+  animation: none;
+}
+
+/* @keyframes dash {
+  to {
+    stroke-dashoffset: -15;
+  }
+} */
+
+/* Driver section */
+.driversHeader {
+  padding: 4px;
+  /* border-bottom: 2px solid #e3f2fd; */
+  /* background: linear-gradient(135deg, #383535 0%, #4a4b4d 100%); */
+  color: rgb(60, 58, 58);
+  /* border-radius: 7px; */
+  margin-top:20px;
+}
+
+.driversTitle {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.driverCard {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top:8px;
+  margin-bottom: 10px;
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
+  /* border: 2px solid #f9fcff; */
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+/* 
+.driverCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ffffff, #ffffff, #ffffff);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.driverCard:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 10px 30px rgba(3, 3, 3, 0.2);
+  border-color: #ffffff;
+}
+
+.driverCard:hover::before {
+  opacity: 1;
+} */
+
+.driverHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.driverImageContainer {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.driverImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e3f2fd;
+  transition: border-color 0.3s ease;
+}
+
+.driverCard:hover .driverImage {
+  border-color: #d9d3d3;
+}
+.line{
+  color:#000000;
+  font-weight: 10px;
+}
+.onlineIndicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  background: #22b742;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(36, 190, 108, 0.4);
+}
+
+.driverBasicInfo {
+  flex: 1;
+}
+
+.driverName {
+  margin: 0 0 5px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0d47a1;
+}
+
+.driverRating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.star {
+  color: #ff9800;
+  font-size: 14px;
+}
+
+.halfStar {
+  color: #bbdefb;
+  font-size: 14px;
+}
+
+.ratingText {
+  font-size: 0.9rem;
+  color: #000000;
+  font-weight: 600;
+  margin-left: 3px;
+}
+
+.driverExperience {
+  font-size: 0.85rem;
+  color: #101010;
+  font-weight: 500;
+}
+
+.driverPrice {
+  text-align: right;
+}
+
+.priceAmount {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #131313;
+  background: linear-gradient(135deg, #2a2929, #514e4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.driverDetails {
+  border-top: 2px solid #e3f2fd;
+  padding-top: 15px;
+}
+
+.routeInfo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.routeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.routeIcon {
+  font-size: 16px;
+  width: 24px;
+  text-align: center;
+}
+
+.routeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.routeLabel {
+  font-size: 0.75rem;
+  color: #353739;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.routeValue {
+  font-size: 0.85rem;
+  color: #484a4d;
+  font-weight: 600;
+}
+
+.bookButton {
+  width: 100%;
+  background: linear-gradient(135deg, #ffa200d5 0%, #e69710 100%);
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.icon{
+  color:#413c3c;
+  margin-bottom:3px;
+}
+.bookButton:hover {
+  background: linear-gradient(135deg, #ffb300 0%, #ffb300 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(241, 241, 241, 0.5);
+}
+
+.bookButton:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(234, 234, 234, 0.4);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .right {
+    width: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+  }
+  
+  .left {
+    height: 60vh;
+  }
+  .map{
+    height:90vh;
+  }
+  
+  .right {
+    width: 100%;
+    height: 90vh;
+    border-radius: 20px 20px 0 0;
+  }
+  
+  .routeInfo {
+    grid-template-columns: 1fr;
+  }
+}
