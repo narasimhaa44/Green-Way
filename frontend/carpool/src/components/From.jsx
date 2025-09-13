@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { MdMyLocation } from "react-icons/md";
 import { GoLocation } from "react-icons/go";
 import { Navigation } from "lucide-react";
-import findImage from "/public/from.jpg";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IoCalendarClearOutline } from "react-icons/io5";
@@ -160,7 +159,7 @@ const From = () => {
         </div>
 
         <div className={styles.right}>
-          <img src={findImage} alt="Find Route" className={styles.find} />
+          <img src="/from.jpg"  alt="Find Route" className={styles.find} />
         </div>
       </div>
     </div>

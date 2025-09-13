@@ -58,7 +58,7 @@ const Contact = () => {
             </p>
           </div>
           <img
-            src="../public/stay.jpg"
+            src="/stay.jpg"
             alt="ecofriendly"
             className={styles.footer}
           />

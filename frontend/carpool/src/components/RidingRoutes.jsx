@@ -70,7 +70,7 @@ useEffect(() => {
       // Pickup marker + circle
       L.marker(pickupCoords,{
           icon: L.icon({
-          iconUrl: "../public/finder.png",
+          iconUrl: "/finder.png",
           iconSize: [60, 60],
           iconAnchor: [30, 60],
         })
@@ -90,7 +90,7 @@ useEffect(() => {
       // Drop marker
       L.marker(dropCoords, {
         icon: L.icon({
-          iconUrl: "../public/dest.png",
+          iconUrl: "/dest.png",
           iconSize: [30, 40],
           iconAnchor: [30, 40],
         }),
@@ -180,7 +180,7 @@ useEffect(() => {
               <div className={styles.driverHeader}>
                 <div className={styles.driverImageContainer}>
                   <img 
-                    src="../public/pic.jpg"
+                    src="/pic.jpg"
                     alt="pic"
                     className={styles.driverImage}
                   /> 

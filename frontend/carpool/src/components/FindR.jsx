@@ -1,10 +1,9 @@
 // Find.js
 import React, { useState, useEffect } from "react";
-import styles from "./Find.module.css";
+import styles from "./FindR.module.css";
 import { MdMyLocation } from "react-icons/md";
 import { GoLocation } from "react-icons/go";
 import { Navigation } from "lucide-react";
-import findImage from "C:/Users/laksh/Desktop/Carpool/frontend/carpool/public/from.jpg";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -192,7 +191,7 @@ navigate("/Finding", { state: { pickup, drop, journeyDate } });
 
         {/* Right image */}
         <div className={styles.right}>
-          <img src={findImage} alt="Find Route" className={styles.find} />
+          <img src="/from.jpg" alt="Find Route" className={styles.find} />
         </div>
       </div>
     </div>

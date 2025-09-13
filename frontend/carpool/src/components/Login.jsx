@@ -32,7 +32,7 @@ const Login = () => {
 
   return (
     <div>
-      <img src="../public/logo.png" alt="logo" className={styles.logo}/>
+      <img src="/logo.png" alt="logo" className={styles.logo}/>
       <div className={styles.outer}>
         <p className={styles.para}>Login in with Google</p>
                 {error && (

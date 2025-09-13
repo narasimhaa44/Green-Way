@@ -86,7 +86,7 @@ const Finding = () => {
 
       L.marker(pickupCoords, {
         icon: L.icon({
-          iconUrl: "../public/finder.png",
+          iconUrl: "/finder.png",
           iconSize: [60, 60],
           iconAnchor: [30, 60],
         }),
@@ -103,7 +103,7 @@ const Finding = () => {
 
       L.marker(dropCoords, {
         icon: L.icon({
-          iconUrl: "../public/dest.png",
+          iconUrl: "/dest.png",
           iconSize: [30, 40],
           iconAnchor: [30, 40],
         }),
@@ -141,7 +141,7 @@ const Finding = () => {
         riders.forEach((rider) => {
           L.marker([rider.pickupLat, rider.pickupLng], {
             icon: L.icon({
-              iconUrl: "../public/rider1.png",
+              iconUrl: "/rider1.png",
               iconSize: [90, 90],
               iconAnchor: [30, 90],
             }),
@@ -229,7 +229,7 @@ const Finding = () => {
               <div className={styles.driverHeader}>
                 <div className={styles.driverImageContainer}>
                   <img
-                    src={rider.picture || "../public/pic.jpg"}
+                    src={rider.picture || "/pic.jpg"}
                     alt={rider.name}
                     className={styles.driverImage}
                       referrerPolicy="no-referrer"

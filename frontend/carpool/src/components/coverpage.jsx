@@ -42,7 +42,7 @@ const CoverPage = () => {
           className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
         >
           <span className="fs-2">
-            <img src="../public/logo.png" className={styles.logo} alt="Logo" />
+            <img src="/logo.png" className={styles.logo} alt="Logo" />
           </span>
         </a>
         <ul className="nav nav-pills">
@@ -89,17 +89,17 @@ const CoverPage = () => {
             🙋 Need Ride
           </button>
           </div>
-          <img src="../public/log.png" className={styles.side}/>
+          <img src="/log.png" className={styles.side}/>
           </div>
         </div>
       </diV>
       <div className={styles.left1}>
-          <img src="../public/coverpage.png" className={styles.left2}/>
+          <img src="/coverpage.png" className={styles.left2}/>
       </div>
       </div>
 
       <div ref={middleRef} className={styles.middle}>
-        <img src="../public/connect.png" className={styles.connect} alt="Connect" />
+        <img src="/connect.png" className={styles.connect} alt="Connect" />
         <div className={styles.innermid}>
           <h1 className={styles.mainheading}>Connect With people</h1>
           <div className={styles.subheading}>

@@ -7,7 +7,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 import Login from "./components/Login.jsx";
-import Find from "./components/Find.jsx";
 import FindUser from "./components/FindUser.jsx";
 import Finding from "./components/Finding.jsx";
 import From from "./components/From.jsx"
@@ -38,10 +37,7 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <Signup/>,
   },
-  {
-    path: "/find",
-    element: <Find />,
-  },
+
 
   {
     path:"/finduser",
