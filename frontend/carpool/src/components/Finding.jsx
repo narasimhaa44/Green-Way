@@ -90,20 +90,17 @@ const Finding = () => {
     const setupMap = async () => {
       if (!pickupCoords || !dropCoords || !mapContainerRef.current) return;
 
-      // Prevent multiple map instances
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
 
-      // Initialize map
       mapRef.current = L.map(mapContainerRef.current).setView(pickupCoords, 11);
-
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "GreenWay",
       }).addTo(mapRef.current);
 
-      // Pickup Marker
+      // Markers
       L.marker(pickupCoords, {
         icon: L.icon({
           iconUrl: "/finder.png",
@@ -114,7 +111,6 @@ const Finding = () => {
         .addTo(mapRef.current)
         .bindPopup("Pickup Point");
 
-      // Drop Marker
       L.marker(dropCoords, {
         icon: L.icon({
           iconUrl: "/dest.png",
@@ -125,13 +121,12 @@ const Finding = () => {
         .addTo(mapRef.current)
         .bindPopup("Destination");
 
-      // Curved Route Line
+      // Route Curve
       const midLat = (pickupCoords[0] + dropCoords[0]) / 2;
       const midLng = (pickupCoords[1] + dropCoords[1]) / 2;
       const offsetLat = (dropCoords[0] - pickupCoords[0]) * 0.3;
       const offsetLng = (dropCoords[1] - pickupCoords[1]) * 0.3;
       const curvePoint = [midLat + offsetLng, midLng - offsetLat];
-
       const curvePoints = [];
       for (let t = 0; t <= 1; t += 0.05) {
         const lat =
@@ -144,35 +139,28 @@ const Finding = () => {
           t * t * dropCoords[1];
         curvePoints.push([lat, lng]);
       }
-
       L.polyline(curvePoints, {
-        color: "#444141ff",
+        color: "#444141",
         weight: 2,
         opacity: 1.0,
-        smoothFactor: 1,
-        className: styles.animatedLine,
       }).addTo(mapRef.current);
 
-      // Fetch and add nearby riders
+      // Add riders
       const riders = await fetchNearbyRiders(pickupCoords);
       setNearbyRiders(riders);
       setLoading(false);
 
-      if (riders.length === 0) {
-        console.log("⚠️ No riders found nearby");
-      } else {
-        riders.forEach((rider) => {
-          L.marker([rider.pickupLat, rider.pickupLng], {
-            icon: L.icon({
-              iconUrl: "/rider1.png",
-              iconSize: [70, 70],
-              iconAnchor: [35, 70],
-            }),
-          })
-            .addTo(mapRef.current)
-            .bindPopup(rider.name);
-        });
-      }
+      riders.forEach((rider) => {
+        L.marker([rider.pickupLat, rider.pickupLng], {
+          icon: L.icon({
+            iconUrl: "/rider1.png",
+            iconSize: [70, 70],
+            iconAnchor: [35, 70],
+          }),
+        })
+          .addTo(mapRef.current)
+          .bindPopup(rider.name);
+      });
 
       const bounds = L.latLngBounds([pickupCoords, dropCoords]);
       mapRef.current.fitBounds(bounds, { padding: [50, 50] });
@@ -188,7 +176,6 @@ const Finding = () => {
     };
   }, [pickupCoords, dropCoords, journeyDate]);
 
-  // === UI Render ===
   return (
     <div className={styles.main}>
       <div className={styles.left}>
@@ -201,7 +188,6 @@ const Finding = () => {
             <span className={styles.statusText}>Live</span>
           </div>
         </div>
-
         <div className={styles.mapContainer}>
           <div ref={mapContainerRef} id="map" className={styles.map} />
         </div>
@@ -218,6 +204,7 @@ const Finding = () => {
         </div>
 
         <div className={styles.driversList}>
+          {loading && <div className={styles.noDrivers}>Fetching nearby drivers...</div>}
           {!loading && nearbyRiders.length === 0 && (
             <div className={styles.noDrivers}>No nearby drivers available 🚗</div>
           )}
@@ -239,56 +226,21 @@ const Finding = () => {
                   <div className={styles.driverRating}>★★★★★</div>
                 </div>
                 <div className={styles.driverPrice}>
-                  <span className={styles.priceAmount}>
-                    <MdCurrencyRupee className={styles.icon} />
-                    {rider.price}
-                  </span>
+                  <MdCurrencyRupee className={styles.icon} />
+                  {rider.price}
                 </div>
               </div>
 
               <div className={styles.driverDetails}>
                 <div className={styles.routeInfo}>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🚀</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>From:</span>
-                      <span className={styles.routeValue}>{rider.pickup}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🎯</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>To:</span>
-                      <span className={styles.routeValue}>{rider.drop}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🚗</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Car Model:</span>
-                      <span className={styles.routeValue}>{rider.carModel}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>💺</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Seats Available:</span>
-                      <span className={styles.routeValue}>{rider.seats}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🔢</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Car Number:</span>
-                      <span className={styles.routeValue}>{rider.carnumber}</span>
-                    </div>
-                  </div>
+                  <div>🚀 From: {rider.pickup}</div>
+                  <div>🎯 To: {rider.drop}</div>
+                  <div>🚗 Car: {rider.carModel}</div>
+                  <div>💺 Seats: {rider.seats}</div>
+                  <div>🔢 No: {rider.carnumber}</div>
                 </div>
 
-                <button
-                  className={styles.bookButton}
-                  onClick={() => handleBooking(rider)}
-                >
+                <button className={styles.bookButton} onClick={() => handleBooking(rider)}>
                   Book Ride
                 </button>
               </div>
