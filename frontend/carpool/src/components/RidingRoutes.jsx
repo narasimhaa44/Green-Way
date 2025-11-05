@@ -20,7 +20,7 @@ const RidingRoute = () => {
 useEffect(() => {
   const fetchUser = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/user?email=${email}`);
+      const res = await axios.get(`https://green-wayb.onrender.com/user?email=${email}`);
       setName(res.data.name);
     } catch (err) {
       console.error("Failed to fetch user:", err);

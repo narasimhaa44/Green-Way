@@ -40,7 +40,7 @@ const FindR = () => {
       localStorage.setItem("userEmail", emailFromUrl);
     } else {
       axios
-        .get("http://localhost:5000/me", { withCredentials: true })
+        .get("https://green-wayb.onrender.com/me", { withCredentials: true })
         .then((res) => {
           if (res.data.email) {
             localStorage.setItem("userEmail", res.data.email);
@@ -87,7 +87,7 @@ const FindR = () => {
     try {
       const email = localStorage.getItem("userEmail"); // ⬅️ stored earlier
 
-      const response = await axios.post("http://localhost:5000/update", {
+      const response = await axios.post("https://green-wayb.onrender.com/update", {
         pickup,
         drop,
         journeyDate, // ⬅️ send date also

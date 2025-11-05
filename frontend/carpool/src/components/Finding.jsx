@@ -21,7 +21,7 @@ const Finding = () => {
   // === Booking Function ===
   const handleBooking = async (rider) => {
     try {
-      const res = await axios.post("http://localhost:5000/booking", {
+      const res = await axios.post("https://green-wayb.onrender.com/booking", {
         userEmail: email,
         riderEmail: rider.email,
         pickup,
@@ -72,7 +72,7 @@ const Finding = () => {
   useEffect(() => {
     const fetchNearbyRiders = async (pickupCoords) => {
       try {
-        const res = await axios.post("http://localhost:5000/nearby-riders", {
+        const res = await axios.post("https://green-wayb.onrender.com/nearby-riders", {
           userLocation: { lat: pickupCoords[0], lng: pickupCoords[1] },
           userDropLocation: { lat: dropCoords[0], lng: dropCoords[1] },
           radius: 5,

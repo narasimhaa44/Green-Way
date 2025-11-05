@@ -42,7 +42,7 @@ const From = () => {
     const emailFromUrl = params.get("email");
     if (emailFromUrl) localStorage.setItem("userEmail", emailFromUrl);
     else {
-      axios.get("http://localhost:5000/me", { withCredentials: true })
+      axios.get("https://green-wayb.onrender.com/me", { withCredentials: true })
         .then((res) => {
           if (res.data.email) localStorage.setItem("userEmail", res.data.email);
         })
@@ -71,7 +71,7 @@ const From = () => {
     const email = localStorage.getItem("userEmail");
 
     try {
-      const response = await axios.post("http://localhost:5000/update1", {
+      const response = await axios.post("https://green-wayb.onrender.com/update1", {
         pickup,
         drop,
         journeyDate,

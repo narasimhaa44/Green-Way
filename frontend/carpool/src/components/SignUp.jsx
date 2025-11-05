@@ -13,7 +13,7 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/userSignup", {
+      const res = await axios.post("https://green-wayb.onrender.com/userSignup", {
         userName,
         email,
         password,

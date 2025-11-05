@@ -22,7 +22,7 @@ const SignUpRide = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/finderSignup",
+        "https://green-wayb.onrender.com/finderSignup",
         { userName, email, password },
         {
           headers: { "Content-Type": "application/json" },
