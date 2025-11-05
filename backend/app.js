@@ -413,6 +413,20 @@ app.post("/nearby-riders", async (req, res) => {
   }
 });
 
+app.get("/test-mail", async (req, res) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
+      subject: "✅ Test from Render",
+      text: "GreenWay mail system works!",
+    });
+    res.send("✅ Email sent successfully!");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
 
 // ================= Start Server =================
 app.listen(process.env.PORT || 5000, ()=>console.log("🚀 Server running on port", process.env.PORT||5000));
