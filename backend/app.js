@@ -9,7 +9,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
-
+const Resend=require("resend");
 const User = require("./models/User");
 const Finder = require("./models/Find");
 
@@ -37,14 +37,9 @@ app.use(session({
   cookie: { secure: false }
 }));
 // ================= BOOKING & EMAIL NOTIFICATION =================
-// ================== BOOKING & EMAIL NOTIFICATION ==================
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,     // your Gmail address
-    pass: process.env.EMAIL_PASS,     // your 16-char App Password
-  },
-});
+// ================== BOOKING & EMAIL NOTIFICATION (Resend version) ==================
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.post("/booking", async (req, res) => {
   const { userEmail, riderEmail, pickup, drop, journeyDate } = req.body;
@@ -54,7 +49,6 @@ app.post("/booking", async (req, res) => {
   }
 
   try {
-    // Fetch rider and user
     const rider = await Finder.findOne({ email: riderEmail });
     const user = await User.findOne({ email: userEmail });
 
@@ -67,72 +61,67 @@ app.post("/booking", async (req, res) => {
       timeStyle: "short",
     });
 
-    // Inline logo for emails (base64 hosted inline or via CID)
     const logoUrl =
       "https://tse4.mm.bing.net/th/id/OIP.9UaBWWZg_dfuJxUGZQ47lQHaHa?w=626&h=626&rs=1&pid=ImgDetMain&o=7&rm=3";
 
-    // ========== Rider Notification ==========
-    const riderMailOptions = {
-      from: `"GreenWay Rides" <${process.env.EMAIL_USER}>`,
-      to: riderEmail,
-      subject: `🚘 New Booking Request from ${user.name || "User"}`,
-      html: `
-        <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
-          <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="text-align:center;margin-bottom:25px;">
-              <img src="${logoUrl}" alt="GreenWay" width="100" height="100" style="border-radius:50%;" />
-            </div>
-            <h2 style="color:#333;">Hi ${rider.name || "Rider"},</h2>
-            <p>You have received a new <b>ride request</b> through <b>GreenWay</b>.</p>
-            <h3>Booking Details:</h3>
-            <ul>
-              <li><b>Passenger:</b> ${user.name || "N/A"}</li>
-              <li><b>Email:</b> ${userEmail}</li>
-              <li><b>Pickup:</b> ${pickup}</li>
-              <li><b>Drop:</b> ${drop}</li>
-              <li><b>Journey Date:</b> ${formattedDate}</li>
-            </ul>
-            <p>📞 Please contact the passenger directly to confirm the trip.</p>
-            <hr/>
-            <p style="text-align:center;color:#777;">Best regards,<br><b>GreenWay Team</b></p>
+    // Rider Mail
+    const riderHtml = `
+      <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
+        <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="text-align:center;margin-bottom:25px;">
+            <img src="${logoUrl}" width="100" height="100" style="border-radius:50%;" />
           </div>
+          <h2>Hi ${rider.name || "Rider"},</h2>
+          <p>You’ve received a new <b>ride request</b> through <b>GreenWay</b>.</p>
+          <ul>
+            <li><b>Passenger:</b> ${user.name || "N/A"}</li>
+            <li><b>Email:</b> ${userEmail}</li>
+            <li><b>Pickup:</b> ${pickup}</li>
+            <li><b>Drop:</b> ${drop}</li>
+            <li><b>Date:</b> ${formattedDate}</li>
+          </ul>
+          <p>📞 Please contact the passenger directly to confirm.</p>
+          <p style="text-align:center;color:#777;">– GreenWay Team</p>
         </div>
-      `,
-    };
+      </div>
+    `;
 
-    // ========== User Confirmation ==========
-    const userMailOptions = {
-      from: `"GreenWay Rides" <${process.env.EMAIL_USER}>`,
-      to: userEmail,
-      subject: "✅ Your Ride Booking Confirmation",
-      html: `
-        <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
-          <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="text-align:center;margin-bottom:25px;">
-              <img src="${logoUrl}" alt="GreenWay" width="100" height="100" style="border-radius:50%;" />
-            </div>
-            <h2>Hi ${user.name || "User"},</h2>
-            <p>Your ride has been <b>successfully booked!</b></p>
-            <h3>Ride Details:</h3>
-            <ul>
-              <li><b>Driver:</b> ${rider.name || "N/A"}</li>
-              <li><b>Email:</b> ${riderEmail}</li>
-              <li><b>Pickup:</b> ${pickup}</li>
-              <li><b>Drop:</b> ${drop}</li>
-              <li><b>Date:</b> ${formattedDate}</li>
-            </ul>
-            <p>🚗 Have a safe and pleasant journey with <b>GreenWay</b>!</p>
-            <hr/>
-            <p style="text-align:center;color:#777;">Warm regards,<br><b>GreenWay Team</b></p>
+    // User Mail
+    const userHtml = `
+      <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
+        <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="text-align:center;margin-bottom:25px;">
+            <img src="${logoUrl}" width="100" height="100" style="border-radius:50%;" />
           </div>
+          <h2>Hi ${user.name || "User"},</h2>
+          <p>Your ride has been <b>successfully booked!</b></p>
+          <ul>
+            <li><b>Driver:</b> ${rider.name || "N/A"}</li>
+            <li><b>Email:</b> ${riderEmail}</li>
+            <li><b>Pickup:</b> ${pickup}</li>
+            <li><b>Drop:</b> ${drop}</li>
+            <li><b>Date:</b> ${formattedDate}</li>
+          </ul>
+          <p>🚗 Have a safe journey with <b>GreenWay</b>!</p>
+          <p style="text-align:center;color:#777;">– GreenWay Team</p>
         </div>
-      `,
-    };
+      </div>
+    `;
 
-    // Send both mails
+    // Send both emails
     await Promise.all([
-      transporter.sendMail(riderMailOptions),
-      transporter.sendMail(userMailOptions),
+      resend.emails.send({
+        from: "GreenWay <no-reply@greenway.app>",
+        to: riderEmail,
+        subject: `🚘 New Booking Request from ${user.name || "User"}`,
+        html: riderHtml,
+      }),
+      resend.emails.send({
+        from: "GreenWay <no-reply@greenway.app>",
+        to: userEmail,
+        subject: "✅ Your Ride Booking Confirmation",
+        html: userHtml,
+      }),
     ]);
 
     console.log(`📩 Emails sent successfully to ${riderEmail} and ${userEmail}`);

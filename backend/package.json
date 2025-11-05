@@ -30,6 +30,7 @@
     "nodemailer": "^7.0.6",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "resend": "^6.4.1",
     "socket.io-client": "^4.8.1",
     "socketio": "^1.0.0",
     "uuid": "^11.1.0"
