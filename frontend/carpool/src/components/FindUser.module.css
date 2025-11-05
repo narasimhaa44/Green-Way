@@ -114,14 +114,23 @@
     font-size: 20px;
   }
 
-  .btn,
+  .btn{
+    height: 45px;
+    font-size: 14px;
+  }
   .btn1 {
     height: 45px;
     font-size: 14px;
+    width:240px;
   }
 
   .google {
     width: 20px;
     height: 20px;
   }
+  /* .log{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+  } */
 }

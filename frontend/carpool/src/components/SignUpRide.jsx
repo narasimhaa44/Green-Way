@@ -1,27 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import styles from "./SignUp.module.css";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
-import { FaRegUser } from "react-icons/fa";
+
 const SignUpRide = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userName,setuserName]=useState("");
+  const [userName, setUserName] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setErrorMsg(""); // reset error message
+
+    if (!userName || !email || !password) {
+      setErrorMsg("All fields are required");
+      return;
+    }
+
     try {
-      const res = await axios.post("http://localhost:5000/finderSignup", {
-        userName,
-        email,
-        password,
-      });
-      console.log(res.data);
-      navigate("/finduser");
+      const res = await axios.post(
+        "http://localhost:5000/finderSignup",
+        { userName, email, password },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+
+      console.log("✅ Signup success:", res.data);
+      navigate("/finduser"); // redirect after success
     } catch (error) {
-      console.error("Signup failed:", error);
+      console.error("❌ Signup failed:", error);
+
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMsg(error.response.data.message);
+      } else {
+        setErrorMsg("Signup failed. Try again.");
+      }
     }
   };
 
@@ -29,27 +47,26 @@ const SignUpRide = () => {
     <div>
       <img src="/logo.png" alt="logo" className={styles.logo} />
       <div className={styles.outer}>
-<p className={styles.para}>
-<CiUser className={styles.icon} />
-  <span className={styles.headingText}>Join GreenWay!</span>
-  <span className={styles.icon}>🌿</span>
-</p>
+        <p className={styles.para}>
+          <CiUser className={styles.icon} />
+          <span className={styles.headingText}>Join GreenWay!</span>
+          <span className={styles.icon}>🌿</span>
+        </p>
+
+        {errorMsg && <p style={{ color: "red", textAlign: "center" }}>{errorMsg}</p>}
+
         <form className={styles.form} onSubmit={handleSignup}>
-          {/* <button type="button" className={styles.btn} onClick={handleGoogleLogin}>
-            <img src="/googleicon.png" alt="google" className={styles.google} />
-            <span className={styles.text}>Continue with Google</span>
-          </button> */}
           <div className={styles.input}>
             <input
-              placeholder="User_Name"
+              placeholder="User Name"
               type="text"
               value={userName}
-              onChange={(e) => setuserName(e.target.value)}
+              onChange={(e) => setUserName(e.target.value)}
               required
             />
             <input
               placeholder="Email"
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -62,11 +79,19 @@ const SignUpRide = () => {
               required
             />
           </div>
+
           <button type="submit" className={styles.btn1}>
             Sign up
           </button>
+
           <p>
-            Already Have an Account? <a href="" onClick={() => navigate("/finduser")} style={{ cursor: "pointer" }}>Login</a>
+            Already have an account?{" "}
+            <span
+              style={{ cursor: "pointer", color: "blue" }}
+              onClick={() => navigate("/finduser")}
+            >
+              Login
+            </span>
           </p>
         </form>
       </div>

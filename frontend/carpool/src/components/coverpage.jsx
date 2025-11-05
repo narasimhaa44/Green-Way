@@ -9,7 +9,7 @@ import { useEffect, useState, useRef } from "react";
 
 const CoverPage = () => {
   const navigate = useNavigate();
-  const fullText = "S hare a ride, save time, and help the planet.";
+  const fullText = "Share a ride, save time, and help the planet.";
   const [displayedText, setDisplayedText] = useState("");
 
   const middleRef = useRef(null);
@@ -21,7 +21,7 @@ const CoverPage = () => {
       setDisplayedText((prev) => prev + fullText[index]);
       index++;
       if (index === fullText.length - 1) clearInterval(interval);
-    }, 100);
+    }, 80);
 
     return () => clearInterval(interval);
   }, []);
@@ -36,101 +36,126 @@ const CoverPage = () => {
 
   return (
     <>
-      <header className="d-flex flex-wrap justify-content-center">
+    <div className={styles.map}>
+      {/* === HEADER === */}
+      <header className="d-flex flex-wrap justify-content-center align-items-center py-3 px-4">
         <a
           href="/"
-          className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none"
+          className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none"
         >
-          <span className="fs-2">
-            <img src="/logo.png" className={styles.logo} alt="Logo" />
-          </span>
+          <img src="/logo.png" className={styles.logo} alt="Logo" />
         </a>
+
         <ul className="nav nav-pills">
           <li className="nav-item">
-            <a href="/" className="nav-link" style={{ color: "black" }} aria-current="page">
+            <a href="/" className="nav-link text-dark fw-semibold">
               Home
             </a>
           </li>
           <li className="nav-item">
-            <a href="/finduser" style={{ color: "black" }} className="nav-link">
+            <a href="/finduser" className="nav-link text-dark fw-semibold">
               ShareRide
             </a>
           </li>
           <li className="nav-item">
-            <a href="/login" style={{ color: "black" }} className="nav-link">
+            <a href="/login" className="nav-link text-dark fw-semibold">
               SearchRide
             </a>
           </li>
           <li className="nav-item">
-            <button onClick={scrollToMiddle} className="nav-link btn btn-link" style={{ color: "black", textDecoration: "none" }}>
+            <button
+              onClick={scrollToMiddle}
+              className="nav-link btn btn-link text-dark fw-semibold"
+            >
               Layout
             </button>
           </li>
           <li className="nav-item">
-            <button onClick={scrollToContact} className="nav-link btn btn-link" style={{ color: "black", textDecoration: "none" }}>
+            <button
+              onClick={scrollToContact}
+              className="nav-link btn btn-link text-dark fw-semibold"
+            >
               About
             </button>
           </li>
         </ul>
       </header>
+
+      {/* === HERO SECTION === */}
       <div className={styles.main}>
-      <diV className={styles.right}>
-        <div className={styles.inner}>
+        <div className={styles.right}>
           <h2 className={styles.mainmatter}>Start Car Pooling Now!</h2>
-          <diV className={styles.inner2}>
-            <p>{displayedText} </p>
-          </diV>
-          <div className={styles.dia}>
-          <div className={styles.inner1}>
-          <button onClick={() => navigate("/finduser")} className={styles.buttons}>
-            🚗 Offer Ride
-          </button>
-          <button onClick={() => navigate("/login")} className={styles.buttons}>
-            🙋 Need Ride
-          </button>
+
+          <div className={styles.inner2}>
+            <p>{displayedText}</p>
           </div>
-          <img src="/log.png" className={styles.side}/>
+
+          <div className={styles.dia}>
+            <div className={styles.inner1}>
+              <button
+                onClick={() => navigate("/finduser")}
+                className={styles.buttons}
+              >
+                🚗 Offer Ride
+              </button>
+              <button
+                onClick={() => navigate("/login")}
+                className={styles.buttons}
+              >
+                🙋 Need Ride
+              </button>
+            </div>
+            <img src="/log.png" className={styles.side} alt="Illustration" />
           </div>
         </div>
-      </diV>
-      <div className={styles.left1}>
-          <img src="/coverpage.png" className={styles.left2}/>
-      </div>
+
+        <div className={styles.left1}>
+          <img src="/coverpage.png" className={styles.left2} alt="Carpool" />
+        </div>
       </div>
 
+      {/* === MIDDLE SECTION === */}
       <div ref={middleRef} className={styles.middle}>
-        <img src="/connect.png" className={styles.connect} alt="Connect" />
+         <img src="/connect.png" className={styles.connect} alt="Connect" />
         <div className={styles.innermid}>
-          <h1 className={styles.mainheading}>Connect With people</h1>
+          <h1 className={styles.mainheading}>Connect With People</h1>
+
           <div className={styles.subheading}>
             <h3>
               <FiSearch /> Match
             </h3>
             <p>
-              Match Find compatible riders and drivers along your route with our smart matching algorithm.
+              Find compatible riders and drivers along your route with our smart
+              matching algorithm.
             </p>
           </div>
+
           <div className={styles.subheading}>
             <h3>
               <FaCarRear /> Ride
             </h3>
             <p>
-              Share comfortable, affordable journeys with verified community members.
+              Share comfortable, affordable journeys with verified community
+              members.
             </p>
           </div>
+
           <div className={styles.subheading}>
             <h3>
               <LuLeaf /> Save
             </h3>
             <p>
-              Cut costs, reduce emissions, and earn rewards with every shared trip.
+              Cut costs, reduce emissions, and earn rewards with every shared
+              trip.
             </p>
           </div>
         </div>
       </div>
 
+      {/* === CONTACT SECTION === */}
       <div ref={contactRef}>
         <Contact />
+      </div>
       </div>
     </>
   );

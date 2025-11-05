@@ -1,63 +1,202 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root{
+  --ink:#484237;
+}
+
 .header{
-  background-color: rgb(255, 255, 255);
-  padding:40px;
-  margin:10px;
+  background-color:#fff;
+  padding:24px;
+  margin:0;
 }
+
 .logo{
-  width:200px;
-  height:60px;
-  margin:8px;
+  width:160px;
+  height:auto;
+  margin:8px 0;
 }
-.leftpart{
-  display: flex;
-  flex-direction: column;
-  gap:5px;
-  margin-top:150px;
-}
-.matter{
-  display: flex;
-  flex-direction: column;
-  padding:40px;
-  justify-content: center;
-  max-width: 700px;
-}
-.matter h1{
-  color:#484237;
-  font-family: "Exo 2", sans-serif;
-  margin-top: 60px;
-  margin-left:30px;
-  font-weight:500px;
-  font-size:50px;
-}
-.matter p{
-  color:#484237;
-  font-family: "Exo 2", sans-serif;
-  margin-top: 30px;
-  font-size:20px;
-  margin-left:30px;
-  max-width:1000px;
-}
-.social{
-  display:flex;
-  flex-direction:row;
-  gap:30px;
-  padding-top:40px;
-  padding-left:30px;
-}
-.footer{
-  width:600px;
-  height:600px;
-  border-radius: 12px;
-}
+
 .side{
   display:flex;
-  flex-direction:row;
-  gap:100px;
+  align-items:center;
+  justify-content:space-between;
+  gap:32px;
+  max-width:1200px;
+  margin:0 auto;
 }
-@media (max-width: 768px) {
-  .header{
-    margin-top:100px;
+
+.matter{
+  display:flex;
+  flex-direction:column;
+  padding:0;
+  justify-content:center;
+  max-width:640px;
+}
+
+.matter h1{
+  color:var(--ink);
+  font-family:"Exo 2", sans-serif;
+  margin:0 0 12px 0;
+  font-weight:600;
+  font-size:40px;
+  line-height:1.15;
+}
+
+.blurb,
+.matter p{
+  color:var(--ink);
+  font-family:"Exo 2", sans-serif;
+  margin-top:16px;
+  font-size:16px;
+  line-height:1.6;
+}
+
+.blurb a{
+  color:inherit;
+  text-decoration:underline;
+}
+
+.social{
+  display:flex;
+  gap:14px;
+  margin-top:16px;
+  flex-wrap:wrap;
+}
+
+.subsocial{
+  width:44px;
+  height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#f2f2f2;
+  transition:transform .15s ease, background .15s ease;
+}
+
+.subsocial:hover{
+  transform:translateY(-2px);
+  background:#ececec;
+}
+
+.subsocial svg{
+  width:22px;
+  height:22px;
+  color:#555;
+}
+
+.footerImg{
+  width:520px;
+  max-width:45vw;
+  height:auto;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.right1{
+  max-width:1200px;
+  margin:24px auto 0;
+}
+
+.in{
+  width:100%;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  justify-content:space-between;
+}
+
+.ul1{
+  display:flex;
+  gap:8px;
+}
+
+/* anchor placeholders (so scrolling has a target) */
+.sectionAnchor{
+  min-height:1px;
+}
+
+/* ===================== */
+/*    PHONE-FIRST STACK  */
+/* ===================== */
+
+@media (max-width: 900px){
+  .side{
+    flex-direction:column;
+    gap:20px;
   }
+
+  .matter{
+    max-width:100%;
+    padding:0 4px;
+    text-align:left;
+  }
+
+  .matter h1{
+    font-size:34px;
+  }
+
+  .blurb,
+  .matter p{
+    font-size:15px;
+  }
+
+  .footerImg{
+    max-width:100%;
+    width:100%;
+    border-radius:12px;
+  }
+
+  .logo{
+    width:140px;
+  }
+}
+
+@media (max-width: 480px){
+  .header{
+    padding:16px 14px;
+  }
+
+  .matter h1{
+    font-size:28px;
+  }
+
+  .social{
+    gap:10px;
+  }
+
+  .subsocial{
+    width:48px;
+    height:48px; /* bigger tap target */
+  }
+
+  .subsocial svg{
+    width:22px;
+    height:22px;
+  }
+
+  .blurb,
+  .matter p{
+    font-size:14px;
+  }
+
+  .in{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  .ul1{
+    width:100%;
+    justify-content:flex-start;
+    gap:4px;
+    flex-wrap:wrap;
+  }
+}
+
+/* very tall narrow phones where the image can dominate: hide illustration */
+@media (max-width: 360px) and (min-height: 750px){
+  .footerImg{ display:none; }
 }
