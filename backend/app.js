@@ -37,11 +37,12 @@ app.use(session({
   cookie: { secure: false }
 }));
 // ================= BOOKING & EMAIL NOTIFICATION =================
+// ================== BOOKING & EMAIL NOTIFICATION ==================
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER,     // your Gmail address
+    pass: process.env.EMAIL_PASS,     // your 16-char App Password
   },
 });
 
@@ -53,7 +54,7 @@ app.post("/booking", async (req, res) => {
   }
 
   try {
-    // Fetch rider and user details from DB
+    // Fetch rider and user
     const rider = await Finder.findOne({ email: riderEmail });
     const user = await User.findOne({ email: userEmail });
 
@@ -66,101 +67,81 @@ app.post("/booking", async (req, res) => {
       timeStyle: "short",
     });
 
-    // ================= Rider Notification =================
+    // Inline logo for emails (base64 hosted inline or via CID)
+    const logoUrl =
+      "https://tse4.mm.bing.net/th/id/OIP.9UaBWWZg_dfuJxUGZQ47lQHaHa?w=626&h=626&rs=1&pid=ImgDetMain&o=7&rm=3";
+
+    // ========== Rider Notification ==========
     const riderMailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"GreenWay Rides" <${process.env.EMAIL_USER}>`,
       to: riderEmail,
       subject: `🚘 New Booking Request from ${user.name || "User"}`,
       html: `
-  <div style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px;">
-    <div style="max-width: 600px; background: #ffffff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <div style="text-align: center; margin-bottom: 25px;">
-        <img src="https://tse4.mm.bing.net/th/id/OIP.9UaBWWZg_dfuJxUGZQ47lQHaHa?w=626&h=626&rs=1&pid=ImgDetMain&o=7&rm=3" alt="GreenWay" style="width: 120px; height: auto;border-radius :50%;" />
-      </div>
-
-      <h2 style="color: #333;">Hi ${rider.name || "Rider"},</h2>
-      <p style="font-size: 16px; color: #444;">
-        You have received a new <b>ride request</b> through <b>GreenWay</b>.
-      </p>
-
-      <h3 style="color: #222;">Booking Details:</h3>
-      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <tr><td style="padding: 8px;">🚘 <b>Passenger Name:</b></td><td>${user.name || "N/A"}</td></tr>
-        <tr><td style="padding: 8px;">📧 <b>Email:</b></td><td>${userEmail}</td></tr>
-        <tr><td style="padding: 8px;">📍 <b>Pickup:</b></td><td>${pickup}</td></tr>
-        <tr><td style="padding: 8px;">🎯 <b>Drop:</b></td><td>${drop}</td></tr>
-        <tr><td style="padding: 8px;">📅 <b>Journey Date:</b></td><td>${formattedDate}</td></tr>
-      </table>
-
-      <p style="margin-top: 18px; font-size: 15px; color: #555;">
-        📞 Please contact the passenger directly to confirm the trip.
-      </p>
-
-      <div style="border-top: 1px solid #ddd; margin-top: 25px; padding-top: 15px; text-align: center;">
-        <p style="font-size: 14px; color: #777;">Best regards,<br><b>GreenWay Team</b><br>Ride Smart. Ride Safe.</p>
-      </div>
-    </div>
-  </div>
-  `,
+        <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
+          <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="text-align:center;margin-bottom:25px;">
+              <img src="${logoUrl}" alt="GreenWay" width="100" height="100" style="border-radius:50%;" />
+            </div>
+            <h2 style="color:#333;">Hi ${rider.name || "Rider"},</h2>
+            <p>You have received a new <b>ride request</b> through <b>GreenWay</b>.</p>
+            <h3>Booking Details:</h3>
+            <ul>
+              <li><b>Passenger:</b> ${user.name || "N/A"}</li>
+              <li><b>Email:</b> ${userEmail}</li>
+              <li><b>Pickup:</b> ${pickup}</li>
+              <li><b>Drop:</b> ${drop}</li>
+              <li><b>Journey Date:</b> ${formattedDate}</li>
+            </ul>
+            <p>📞 Please contact the passenger directly to confirm the trip.</p>
+            <hr/>
+            <p style="text-align:center;color:#777;">Best regards,<br><b>GreenWay Team</b></p>
+          </div>
+        </div>
+      `,
     };
 
-    // ================= User Confirmation Email =================
+    // ========== User Confirmation ==========
     const userMailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"GreenWay Rides" <${process.env.EMAIL_USER}>`,
       to: userEmail,
-      subject: `✅ Your Ride Booking Confirmation`,
-      html:`
-  <div style="font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px;">
-    <div style="max-width: 600px; background: #ffffff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      <div style="text-align: center; margin-bottom: 25px;">
-        <img src="https://tse4.mm.bing.net/th/id/OIP.9UaBWWZg_dfuJxUGZQ47lQHaHa?w=626&h=626&rs=1&pid=ImgDetMain&o=7&rm=3" alt="GreenWay" style="width: 120px; height: auto; border-radius:50%" />
-      </div>
-
-      <h2 style="color: #333;">Hi ${user.name || "User"},</h2>
-      <p style="font-size: 16px; color: #444;">
-        Your ride has been <b>successfully booked!</b> Here are your trip details:
-      </p>
-
-      <h3 style="color: #222;">Ride Details:</h3>
-      <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <tr><td style="padding: 8px;">👨‍✈️ <b>Driver Name:</b></td><td>${rider.name || "N/A"}</td></tr>
-        <tr><td style="padding: 8px;">📧 <b>Email:</b></td><td>${riderEmail}</td></tr>
-        <tr><td style="padding: 8px;">📍 <b>Pickup:</b></td><td>${pickup}</td></tr>
-        <tr><td style="padding: 8px;">🎯 <b>Drop:</b></td><td>${drop}</td></tr>
-        <tr><td style="padding: 8px;">📅 <b>Date:</b></td><td>${formattedDate}</td></tr>
-      </table>
-
-      <p style="margin-top: 18px; font-size: 15px; color: #555;">
-        🚗 Have a safe and pleasant journey with <b>GreenWay</b>! We’re happy to have you onboard.
-      </p>
-
-      <div style="border-top: 1px solid #ddd; margin-top: 25px; padding-top: 15px; text-align: center;">
-        <p style="font-size: 14px; color: #777;">Warm regards,<br><b>GreenWay Team</b><br>Connecting Riders, Building Futures 🌱</p>
-      </div>
-    </div>
-  </div>
-  `,
+      subject: "✅ Your Ride Booking Confirmation",
+      html: `
+        <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
+          <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="text-align:center;margin-bottom:25px;">
+              <img src="${logoUrl}" alt="GreenWay" width="100" height="100" style="border-radius:50%;" />
+            </div>
+            <h2>Hi ${user.name || "User"},</h2>
+            <p>Your ride has been <b>successfully booked!</b></p>
+            <h3>Ride Details:</h3>
+            <ul>
+              <li><b>Driver:</b> ${rider.name || "N/A"}</li>
+              <li><b>Email:</b> ${riderEmail}</li>
+              <li><b>Pickup:</b> ${pickup}</li>
+              <li><b>Drop:</b> ${drop}</li>
+              <li><b>Date:</b> ${formattedDate}</li>
+            </ul>
+            <p>🚗 Have a safe and pleasant journey with <b>GreenWay</b>!</p>
+            <hr/>
+            <p style="text-align:center;color:#777;">Warm regards,<br><b>GreenWay Team</b></p>
+          </div>
+        </div>
+      `,
     };
 
-    // Send both emails asynchronously
+    // Send both mails
     await Promise.all([
       transporter.sendMail(riderMailOptions),
       transporter.sendMail(userMailOptions),
     ]);
 
     console.log(`📩 Emails sent successfully to ${riderEmail} and ${userEmail}`);
-
-    res.json({
-      message: "Booking confirmed and emails sent successfully",
-      rider: riderEmail,
-      user: userEmail,
-    });
+    res.json({ message: "Booking confirmed and emails sent successfully" });
   } catch (err) {
     console.error("❌ Booking email failed:", err);
-    res.status(500).json({ message: "Failed to process booking" });
+    res.status(500).json({ message: "Failed to process booking", error: err.message });
   }
 });
-
 
 // ================= Passport =================
 app.use(passport.initialize());
