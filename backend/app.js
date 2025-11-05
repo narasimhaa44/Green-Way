@@ -348,15 +348,16 @@ const haversineDistance = (coord1, coord2) => {
 const geocode = async (place) => {
   try {
     const res = await axios.get("https://nominatim.openstreetmap.org/search", {
-      params: { format: "json", q: place },
+      params: { format: "json", q: place, limit: 1 },
+      headers: { "User-Agent": "GreenWay/1.0 (support@greenway.com)" } // required
     });
-    const data = res.data;
-    if (data.length > 0) {
-      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+
+    if (res.data.length > 0) {
+      return [parseFloat(res.data[0].lat), parseFloat(res.data[0].lon)];
     }
     return null;
   } catch (err) {
-    console.error("❌ Geocoding failed for:", place);
+    console.error("❌ Geocoding failed for:", place, err.message);
     return null;
   }
 };
