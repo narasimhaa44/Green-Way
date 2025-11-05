@@ -9,7 +9,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
-const Resend=require("resend");
 const User = require("./models/User");
 const Finder = require("./models/Find");
 
