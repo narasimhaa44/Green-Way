@@ -37,18 +37,36 @@ app.use(session({
   cookie: { secure: false }
 }));
 // ================= BOOKING & EMAIL NOTIFICATION =================
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+// ================= BOOKING & EMAIL NOTIFICATION =================
+let transporter;
 
-transporter.verify((error) => {
+if (process.env.NODE_ENV === "development") {
+  // ✅ For local testing with Gmail (localhost only)
+  transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+} else {
+  // ✅ For Render (production) using Brevo SMTP
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+}
+
+transporter.verify((error, success) => {
   if (error) console.error("❌ Email transporter error:", error);
   else console.log("✅ Nodemailer ready to send emails");
 });
+
 
 // ================= BOOKING ROUTE =================
 app.post("/booking", async (req, res) => {
