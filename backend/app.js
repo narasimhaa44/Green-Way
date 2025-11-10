@@ -37,16 +37,25 @@ app.use(session({
   cookie: { secure: false }
 }));
 // ================= BOOKING & EMAIL NOTIFICATION =================
-// ================== BOOKING & EMAIL NOTIFICATION (Resend version) ==================
-const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
+transporter.verify((error) => {
+  if (error) console.error("❌ Email transporter error:", error);
+  else console.log("✅ Nodemailer ready to send emails");
+});
+
+// ================= BOOKING ROUTE =================
 app.post("/booking", async (req, res) => {
   const { userEmail, riderEmail, pickup, drop, journeyDate } = req.body;
 
-  if (!userEmail || !riderEmail || !pickup || !drop || !journeyDate) {
+  if (!userEmail || !riderEmail || !pickup || !drop || !journeyDate)
     return res.status(400).json({ message: "Missing required booking details" });
-  }
 
   try {
     const rider = await Finder.findOne({ email: riderEmail });
@@ -61,76 +70,137 @@ app.post("/booking", async (req, res) => {
       timeStyle: "short",
     });
 
-    const logoUrl =
-      "https://tse4.mm.bing.net/th/id/OIP.9UaBWWZg_dfuJxUGZQ47lQHaHa?w=626&h=626&rs=1&pid=ImgDetMain&o=7&rm=3";
-
-    // Rider Mail
-    const riderHtml = `
-      <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
-        <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="text-align:center;margin-bottom:25px;">
-            <img src="${logoUrl}" width="100" height="100" style="border-radius:50%;" />
+    // ========= Rider Email =========
+    const riderMail = {
+      from: `"GreenWay" <${process.env.EMAIL_USER}>`,
+      to: riderEmail,
+      subject: `🚘 New Booking Request from ${user.name || "User"}`,
+      html: `
+        <div style="font-family: Arial; background: #f7f7f7; padding: 20px;">
+          <div style="max-width:600px; margin:auto; background:#fff; border-radius:10px; padding:20px;">
+            <h2>Hi ${rider.name || "Rider"},</h2>
+            <p>You have received a new ride request through <b>GreenWay</b>.</p>
+            <p><b>Passenger:</b> ${user.name} (${user.email})</p>
+            <p><b>Pickup:</b> ${pickup}</p>
+            <p><b>Drop:</b> ${drop}</p>
+            <p><b>Journey Date:</b> ${formattedDate}</p>
+            <hr/>
+            <p style="font-size:14px;color:#555;">📞 Contact the passenger directly to confirm.</p>
+            <p style="font-size:13px;color:#777;">— GreenWay Team 🚗</p>
           </div>
-          <h2>Hi ${rider.name || "Rider"},</h2>
-          <p>You’ve received a new <b>ride request</b> through <b>GreenWay</b>.</p>
-          <ul>
-            <li><b>Passenger:</b> ${user.name || "N/A"}</li>
-            <li><b>Email:</b> ${userEmail}</li>
-            <li><b>Pickup:</b> ${pickup}</li>
-            <li><b>Drop:</b> ${drop}</li>
-            <li><b>Date:</b> ${formattedDate}</li>
-          </ul>
-          <p>📞 Please contact the passenger directly to confirm.</p>
-          <p style="text-align:center;color:#777;">– GreenWay Team</p>
-        </div>
-      </div>
-    `;
+        </div>`,
+    };
 
-    // User Mail
-    const userHtml = `
-      <div style="font-family: Arial; background-color: #f7f7f7; padding: 20px;">
-        <div style="max-width: 600px; background: #fff; border-radius: 10px; margin: auto; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="text-align:center;margin-bottom:25px;">
-            <img src="${logoUrl}" width="100" height="100" style="border-radius:50%;" />
+    // ========= User Email =========
+    const userMail = {
+      from: `"GreenWay" <${process.env.EMAIL_USER}>`,
+      to: userEmail,
+      subject: "✅ Your Ride Booking Confirmation",
+      html: `
+        <div style="font-family: Arial; background: #f7f7f7; padding: 20px;">
+          <div style="max-width:600px; margin:auto; background:#fff; border-radius:10px; padding:20px;">
+            <h2>Hi ${user.name || "User"},</h2>
+            <p>Your ride has been successfully booked!</p>
+            <p><b>Driver:</b> ${rider.name} (${rider.email})</p>
+            <p><b>Pickup:</b> ${pickup}</p>
+            <p><b>Drop:</b> ${drop}</p>
+            <p><b>Date:</b> ${formattedDate}</p>
+            <hr/>
+            <p style="font-size:14px;color:#555;">🚗 Have a safe and pleasant journey!</p>
+            <p style="font-size:13px;color:#777;">— GreenWay Team 🌱</p>
           </div>
-          <h2>Hi ${user.name || "User"},</h2>
-          <p>Your ride has been <b>successfully booked!</b></p>
-          <ul>
-            <li><b>Driver:</b> ${rider.name || "N/A"}</li>
-            <li><b>Email:</b> ${riderEmail}</li>
-            <li><b>Pickup:</b> ${pickup}</li>
-            <li><b>Drop:</b> ${drop}</li>
-            <li><b>Date:</b> ${formattedDate}</li>
-          </ul>
-          <p>🚗 Have a safe journey with <b>GreenWay</b>!</p>
-          <p style="text-align:center;color:#777;">– GreenWay Team</p>
-        </div>
-      </div>
-    `;
+        </div>`,
+    };
 
-    // Send both emails
-    await Promise.all([
-      resend.emails.send({
-        from: "GreenWay <no-reply@greenway.app>",
-        to: riderEmail,
-        subject: `🚘 New Booking Request from ${user.name || "User"}`,
-        html: riderHtml,
-      }),
-      resend.emails.send({
-        from: "GreenWay <no-reply@greenway.app>",
-        to: userEmail,
-        subject: "✅ Your Ride Booking Confirmation",
-        html: userHtml,
-      }),
-    ]);
+    await Promise.all([transporter.sendMail(riderMail), transporter.sendMail(userMail)]);
+    console.log(`📩 Booking emails sent to ${riderEmail} and ${userEmail}`);
 
-    console.log(`📩 Emails sent successfully to ${riderEmail} and ${userEmail}`);
-    res.json({ message: "Booking confirmed and emails sent successfully" });
+    res.json({
+      message: "Booking confirmed and emails sent successfully",
+      rider: riderEmail,
+      user: userEmail,
+    });
   } catch (err) {
     console.error("❌ Booking email failed:", err);
-    res.status(500).json({ message: "Failed to process booking", error: err.message });
+    res.status(500).json({ message: "Failed to process booking" });
   }
 });
+
+// ================= PASSPORT SETUP =================
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, { id: user.id, model: user instanceof User ? "User" : "Finder" });
+});
+
+passport.deserializeUser(async (data, done) => {
+  try {
+    const model = data.model === "User" ? User : Finder;
+    const user = await model.findById(data.id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
+
+// ================= GOOGLE OAUTH =================
+passport.use(
+  "google-finder",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_FINDER_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_FINDER_CLIENT_SECRET,
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/finder/callback`,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let finder = await Finder.findOne({ email: profile.emails[0].value });
+        if (!finder) {
+          finder = await Finder.create({
+            oauthId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            picture: profile.photos[0].value,
+            provider: "google-finder",
+          });
+        }
+        done(null, finder);
+      } catch (err) {
+        done(err, null);
+      }
+    }
+  )
+);
+
+passport.use(
+  "google-user",
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_USER_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_USER_CLIENT_SECRET,
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/user/callback`,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (!user) {
+          user = await User.create({
+            oauthId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            picture: profile.photos[0].value,
+            provider: "google-user",
+          });
+        }
+        done(null, user);
+      } catch (err) {
+        done(err, null);
+      }
+    }
+  )
+);
+
 
 // ================= Passport =================
 app.use(passport.initialize());
