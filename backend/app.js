@@ -38,7 +38,9 @@ app.use(session({
 }));
 // ================= BOOKING & EMAIL NOTIFICATION =================
 const transporter = nodemailer.createTransport({
-  host: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // use SSL
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
