@@ -40,6 +40,33 @@ app.use(session({
 // ================= BOOKING & EMAIL NOTIFICATION =================
 let transporter;
 
+// ================= BREVO (API) EMAIL SENDER =================
+const Brevo = require("@getbrevo/brevo");
+const brevo = new Brevo.TransactionalEmailsApi();
+
+brevo.setApiKey(
+  Brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
+
+async function sendEmail(to, subject, htmlContent) {
+  const sender = { email: process.env.EMAIL_USER, name: "GreenWay" };
+  const receivers = [{ email: to }];
+
+  try {
+    await brevo.sendTransacEmail({
+      sender,
+      to: receivers,
+      subject,
+      htmlContent,
+    });
+    console.log(`✅ Email sent successfully to ${to}`);
+  } catch (err) {
+    console.error(`❌ Email send failed to ${to}:`, err.message);
+  }
+}
+
+
 if (process.env.NODE_ENV === "development") {
   // ✅ For local testing with Gmail (localhost only)
   transporter = nodemailer.createTransport({
@@ -130,7 +157,11 @@ app.post("/booking", async (req, res) => {
         </div>`,
     };
 
-    await Promise.all([transporter.sendMail(riderMail), transporter.sendMail(userMail)]);
+await Promise.all([
+  sendEmail(riderEmail, riderMail.subject, riderMail.html),
+  sendEmail(userEmail, userMail.subject, userMail.html),
+]);
+
     console.log(`📩 Booking emails sent to ${riderEmail} and ${userEmail}`);
 
     res.json({
@@ -492,18 +523,18 @@ app.post("/nearby-riders", async (req, res) => {
 
 app.get("/test-mail", async (req, res) => {
   try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER,
-      subject: "✅ Test from Render",
-      text: "GreenWay mail system works!",
-    });
-    res.send("✅ Email sent successfully!");
+    await sendEmail(
+      process.env.EMAIL_USER,
+      "✅ Test from Render via Brevo API",
+      "<p>GreenWay Brevo API mail system works perfectly 🚀</p>"
+    );
+    res.send("✅ Email sent successfully using Brevo API!");
   } catch (err) {
-    console.error(err);
+    console.error("❌ Test mail failed:", err.message);
     res.status(500).send(err.message);
   }
 });
+
 
 // ================= Start Server =================
 app.listen(process.env.PORT || 5000, ()=>console.log("🚀 Server running on port", process.env.PORT||5000));
