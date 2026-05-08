@@ -12,18 +12,6 @@ const FindUser = () => {
   const handleGoogleLogin = () => {
     window.location.href = "https://green-wayb.onrender.com/auth/google/finder";
   };
-// const handleGoogleLogin = () => {
-//   const width = 500;
-//   const height = 600;
-//   const left = (window.innerWidth - width) / 2;
-//   const top = (window.innerHeight - height) / 2;
-
-//   window.open(
-//     "http://localhost:5000/auth/google/finder",
-//     "GoogleLogin",
-//     `width=${width},height=${height},top=${top},left=${left}`
-//   );
-// };
 
   const handleEvent = async (e) => {
     e.preventDefault();
@@ -33,6 +21,7 @@ const FindUser = () => {
         password
       });
       console.log(res.data);
+      localStorage.setItem("user", JSON.stringify(res.data));
       navigate(`/from?email=${encodeURIComponent(res.data.email)}`);
     } catch (error) {
       console.error("Login failed:", error);
@@ -43,7 +32,7 @@ const FindUser = () => {
   return (
     <div>
       <img src="/logo.png" alt="logo" className={styles.logo} />
-      
+
       <div className={styles.outer}>
         <p className={styles.para}>Login in with Google</p>
 
@@ -77,11 +66,11 @@ const FindUser = () => {
               required
             />
           </div>
-        <div className={styles.log}>
-          <button className={styles.btn1}>
-            Log in
-          </button>
-        </div>
+          <div className={styles.log}>
+            <button className={styles.btn1}>
+              Log in
+            </button>
+          </div>
           <p>
             Create an Account? <a href="" onClick={() => navigate("/signupR")} style={{ cursor: "pointer" }}>Sign-up</a>
           </p>

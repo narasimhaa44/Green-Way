@@ -16,6 +16,7 @@ import SignUpRide from "./components/SignUpRide.jsx";
 import FindR from "./components/FindR.jsx";
 import Success from "./components/Success.jsx";
 import SuccessR from "./components/SucessR.jsx";
+import OAuthSuccess from "./components/OAuthSuccess.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,47 +26,51 @@ const router = createBrowserRouter([
     path: "/login",
     element: <Login />,
   },
-    {
-    path: "/Riding",
-    element: <RidingRoute/>,
+  {
+    path: "/oauth-success",
+    element: <OAuthSuccess />,
   },
-    {
+  {
+    path: "/Riding",
+    element: <RidingRoute />,
+  },
+  {
     path: "/from",
     element: <From />,
   },
-      {
+  {
     path: "/signup",
-    element: <Signup/>,
+    element: <Signup />,
   },
 
 
   {
-    path:"/finduser",
-    element:<FindUser/>,
+    path: "/finduser",
+    element: <FindUser />,
   },
   {
-    path:"/SucessU",
-    element:<Success/>,
+    path: "/SucessU",
+    element: <Success />,
   },
-    {
-    path:"/SucessR",
-    element:<SuccessR/>,
+  {
+    path: "/SucessR",
+    element: <SuccessR />,
   },
   {
     path: "/Finding",
     element: <Finding />,
   },
   {
-    path:"/signupR",
-    element:<SignUpRide/>
+    path: "/signupR",
+    element: <SignUpRide />
   },
   {
-    path:"/findR",
-    element:<FindR/>
+    path: "/findR",
+    element: <FindR />
   }
 ]);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-  <RouterProvider router={router} />
+    <RouterProvider router={router} />
   </StrictMode>
 );

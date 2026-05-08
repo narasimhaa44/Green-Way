@@ -3,60 +3,38 @@ import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MdCurrencyRupee } from "react-icons/md";
+import { MapPin, Flag, Calendar, Car, Users, Hash, IndianRupee } from "lucide-react";
 import axios from "axios";
 
 const RidingRoute = () => {
   const [pickupCoords, setPickupCoords] = useState(null);
   const [dropCoords, setDropCoords] = useState(null);
-  const [name,setName]=useState(null);
+  const [name, setName] = useState(null);
 
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
-  const { pickup, drop, journeyDate,carModel, seatsAvailable, carNumber,Cost,email } = location.state || {};
-
-useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`https://green-wayb.onrender.com/user?email=${email}`);
-      setName(res.data.name);
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
-  };
-  fetchUser();
-}, [email]);
-
-  const geocode = async (place) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`
-      );
-      const data = await res.json();
-      if (data.length > 0) {
-        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-      }
-      return null;
-    } catch (err) {
-      console.error("Geocoding error:", err);
-      return null;
-    }
-  };
+  const { pickup, drop, journeyDate, carModel, seatsAvailable, carNumber, Cost, email } = location.state || {};
 
   useEffect(() => {
-    const fetchCoords = async () => {
-      if (pickup) {
-        const coords = await geocode(pickup);
-        setPickupCoords(coords);
-      }
-      if (drop) {
-        const coords = await geocode(drop);
-        setDropCoords(coords);
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`https://green-wayb.onrender.com/user?email=${email}`);
+        setName(res.data.name);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
       }
     };
-    fetchCoords();
+    fetchUser();
+  }, [email]);
+
+
+  useEffect(() => {
+    if (pickup && drop) {
+      setPickupCoords([pickup.lat, pickup.lng]);
+      setDropCoords([drop.lat, drop.lng]);
+    }
   }, [pickup, drop]);
 
   useEffect(() => {
@@ -68,8 +46,8 @@ useEffect(() => {
       }).addTo(mapRef.current);
 
       // Pickup marker + circle
-      L.marker(pickupCoords,{
-          icon: L.icon({
+      L.marker(pickupCoords, {
+        icon: L.icon({
           iconUrl: "/finder.png",
           iconSize: [60, 60],
           iconAnchor: [30, 60],
@@ -119,11 +97,11 @@ useEffect(() => {
       }
 
       L.polyline(curvePoints, {
-        color: "#444141ff",
-        weight: 2,
-        opacity: 1.0,
+        color: "#374151",
+        weight: 3,
+        opacity: 0.8,
         smoothFactor: 1,
-        className:styles.animatedLine,
+        dashArray: "5, 10" // This creates the dotted/dashed effect
       }).addTo(mapRef.current);
 
       const bounds = L.latLngBounds([pickupCoords, dropCoords]);
@@ -176,81 +154,81 @@ useEffect(() => {
           <h3 className={styles.driversTitle}>📃 Summary of Trip</h3>
         </div>
         <hr className={styles.line}></hr>
-            <div  className={styles.driverCard}>
-              <div className={styles.driverHeader}>
-                <div className={styles.driverImageContainer}>
-                  <img 
-                    src="/pic.jpg"
-                    alt="pic"
-                    className={styles.driverImage}
-                  /> 
-                  <div className={styles.onlineIndicator}></div>
-                </div>
-                <div className={styles.driverBasicInfo}>
-                  <h4 className={styles.driverName}>{name}</h4>
-                  <div className={styles.driverRating}>
-                    {/* {renderStars(rating)} */}
-                    <span className={styles.ratingText}></span>
-                  </div>
-                  <div className={styles.driverExperience}>experience</div>
-                </div>
-                <div className={styles.driverPrice}>
-                  <span className={styles.priceAmount}><MdCurrencyRupee  className={styles.icon} />{Cost}</span>
-                </div>
+        <div className={styles.driverCard}>
+          <div className={styles.driverHeader}>
+            <div className={styles.driverImageContainer}>
+              <img
+                src="/pic.jpg"
+                alt="pic"
+                className={styles.driverImage}
+              />
+              <div className={styles.onlineIndicator}></div>
+            </div>
+            <div className={styles.driverBasicInfo}>
+              <h4 className={styles.driverName}>{name}</h4>
+              <div className={styles.driverRating}>
+                {/* {renderStars(rating)} */}
+                <span className={styles.ratingText}></span>
               </div>
+              <div className={styles.driverExperience}>experience</div>
+            </div>
+            <div className={styles.driverPrice}>
+              <span className={styles.priceAmount}><IndianRupee className={styles.icon} />{Cost}</span>
+            </div>
+          </div>
 
-              {/* <div className={styles.driverDetails}> */}
-                <div className={styles.routeInfo}>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🚀</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>From:</span>
-                      <span className={styles.routeValue}>{pickup}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🎯</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>To:</span>
-                      <span className={styles.routeValue}>{drop}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🕒</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Departure:</span>
-                      <span className={styles.routeValue}>{journeyDate}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🚗</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Vehicle:</span>
-                      <span className={styles.routeValue}>{carModel}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>💺</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>Seats Available:</span>
-                      <span className={styles.routeValue}>{seatsAvailable}</span>
-                    </div>
-                  </div>
-                  <div className={styles.routeItem}>
-                    <div className={styles.routeIcon}>🔢</div>
-                    <div className={styles.routeText}>
-                      <span className={styles.routeLabel}>car Number:</span>
-                      <span className={styles.routeValue}>{carNumber}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button className={styles.bookButton} onClick={()=>navigate("/SucessR")}>
-                  Register Ride
-                </button>
+          {/* <div className={styles.driverDetails}> */}
+          <div className={styles.routeInfo}>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><MapPin size={20} color="#3b82f6" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>From:</span>
+                <span className={styles.routeValue}>{pickup?.name}</span>
               </div>
             </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><Flag size={20} color="#ef4444" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>To:</span>
+                <span className={styles.routeValue}>{drop?.name}</span>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><Calendar size={20} color="#f59e0b" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>Departure:</span>
+                <span className={styles.routeValue}>{journeyDate}</span>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><Car size={20} color="#10b981" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>Vehicle:</span>
+                <span className={styles.routeValue}>{carModel}</span>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><Users size={20} color="#8b5cf6" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>Seats Available:</span>
+                <span className={styles.routeValue}>{seatsAvailable}</span>
+              </div>
+            </div>
+            <div className={styles.routeItem}>
+              <div className={styles.routeIcon}><Hash size={20} color="#6b7280" /></div>
+              <div className={styles.routeText}>
+                <span className={styles.routeLabel}>Car Number:</span>
+                <span className={styles.routeValue}>{carNumber}</span>
+              </div>
+            </div>
+          </div>
+
+          <button className={styles.bookButton} onClick={() => navigate("/SucessR")}>
+            Register Ride
+          </button>
         </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,0 +1,182 @@
+.container {
+  padding: 18px 16px 10px;
+  text-align: center;
+  background: #f9fbfa;
+}
+
+.heading {
+  color: green;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+h1 {
+  font-size: clamp(1.7rem, 4.2vw, 2.15rem);
+  margin-bottom: 14px;
+  line-height: 1.18;
+  color: #1d2722;
+}
+
+.stepsRow {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.step {
+  width: 160px;
+  transition: 0.3s;
+}
+
+.step:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: auto;
+  margin-bottom: 15px;
+}
+
+.stepsWrapper {
+  position: relative;
+  margin-top: 14px;
+  max-width: 980px;
+  margin-inline: auto;
+}
+.line {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  width: 86%;
+  height: 1.5px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(to right, #1f7a5a, #4fd1a5);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.stepsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  z-index: 2; 
+}
+
+.step {
+  width: 170px;
+  text-align: center;
+  position: relative;
+  z-index: 3;
+}
+
+/* ICON */
+.icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: auto;
+  box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+
+  position: relative;
+  z-index: 4;
+}
+
+.step h3 {
+  font-size: 1rem;
+  margin: 10px 0 6px;
+}
+
+.step p {
+  font-size: 0.86rem;
+  color: #5b6460;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 14px 10px 8px;
+  }
+
+  .stepsWrapper {
+    margin-top: 10px;
+  }
+
+  .stepsRow {
+    gap: 2px;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    padding: 0 2px;
+  }
+
+  .step {
+    width: 24%;
+    min-width: 72px;
+  }
+
+  .icon {
+    width: 38px;
+    height: 38px;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.12);
+  }
+
+  .step h3 {
+    font-size: 0.82rem;
+    margin: 7px 0 2px;
+    min-height: 30px;
+  }
+
+  .step p {
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: 2.55rem;
+    line-height: 1.06;
+    margin-bottom: 10px;
+  }
+
+  .heading {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .line {
+    display: block;
+    top: 19px;
+    width: 84%;
+  }
+}
+
+@media (max-width: 390px) {
+  h1 {
+    font-size: 2.15rem;
+  }
+
+  .step h3 {
+    font-size: 0.78rem;
+  }
+
+  .step p {
+    font-size: 0.68rem;
+  }
+}

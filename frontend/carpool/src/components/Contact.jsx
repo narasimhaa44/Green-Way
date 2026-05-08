@@ -20,7 +20,6 @@ const Contact = () => {
 
   return (
     <>
-      {/* hero / header */}
       <div className={styles.header}>
         <div className={styles.side}>
           <div className={styles.matter}>
@@ -82,11 +81,9 @@ const Contact = () => {
             <p className={styles.blurb}>
               © 2025 Green Way — Making every commute greener, one shared ride
               at a time. Questions? Contact our support team at{" "}
-              <a href="mailto:lakshminarasimh44@gmail.com">
+              <a href="mailto:[EMAIL_ADDRESS]">
                 lakshminarasimh44@gmail.com
-              </a>{" "}
-              or call <a href="tel:+919849111050">+91 98491 11050</a> during business
-              hours.
+              </a>
             </p>
           </div>
 
@@ -111,7 +108,6 @@ const Contact = () => {
           className={`${styles.right1} d-flex flex-wrap justify-content-between align-items-center py-3 my-3 border-top`}
         >
           <div className={styles.in}>
-            {/* if the file is /public/logo.png, use /logo.png */}
             <img src="/logo.png" alt="Green Way logo" className={styles.logo} />
             <p className="col-md-4 mb-0 text-body-secondary">© 2025 Company, Inc</p>
 
@@ -127,18 +123,8 @@ const Contact = () => {
                 </a>
               </li>
               <li className="nav-item">
-                <a href="/login" className="nav-link px-2 text-body-secondary">
-                  SearchRide
-                </a>
-              </li>
-              <li className="nav-item">
-                <a href="#layout" onClick={scrollToMiddle} className="nav-link px-2 text-body-secondary">
-                  Layout
-                </a>
-              </li>
-              <li className="nav-item">
                 <a href="#about" onClick={scrollToContact} className="nav-link px-2 text-body-secondary">
-                  About
+                  Steps
                 </a>
               </li>
             </ul>

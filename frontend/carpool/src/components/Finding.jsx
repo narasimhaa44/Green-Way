@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MdCurrencyRupee } from "react-icons/md";
+import { MapPin, Car, Users, Hash, IndianRupee, ArrowRight, Star } from "lucide-react";
 import axios from "axios";
 
 const Finding = () => {
@@ -11,66 +11,62 @@ const Finding = () => {
   const [dropCoords, setDropCoords] = useState(null);
   const [nearbyRiders, setNearbyRiders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bookingLoading, setBookingLoading] = useState(false);
+
   const navigate = useNavigate();
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
 
   const location = useLocation();
-  const { pickup, drop, journeyDate, email } = location.state || {};
-
-  // === Booking Function ===
+  const { pickup, drop, journeyDate } = location.state || {};
+  useEffect(() => {
+    if (!pickup || !drop || !journeyDate) {
+      alert("Invalid route data");
+      navigate("/findR");
+    }
+  }, []);
   const handleBooking = async (rider) => {
     try {
-      const res = await axios.post("https://green-wayb.onrender.com/booking", {
-        userEmail: email,
+      const user = JSON.parse(localStorage.getItem("user"));
+  
+      if (!user) {
+        alert("Please login first");
+        navigate("/login");
+        return;
+      }
+  
+      setBookingLoading(true);
+  
+      await axios.post("https://green-wayb.onrender.com/booking",{
+        userEmail: user.email,
         riderEmail: rider.email,
-        pickup,
-        drop,
+  
+        pickup: pickup.name, 
+        drop: drop.name,     
         journeyDate,
+        price: rider.price
       });
-      console.log("✅ Booking response:", res.data);
+  
+      alert("Ride booked successfully");
       navigate("/SucessU");
-    } catch (error) {
-      console.error("❌ Booking failed:", error);
-      alert("Booking failed. Try again.");
-    }
-  };
-
-  // === Geocoding Function ===
-  const geocode = async (place) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`
-      );
-      const data = await res.json();
-      if (data.length > 0) {
-        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-      }
-      return null;
+  
     } catch (err) {
-      console.error("Geocoding error:", err);
-      return null;
+      console.log(err.response?.data); // 🔥 DEBUG
+      alert("Booking failed");
+    } finally {
+      setBookingLoading(false);
     }
   };
 
-  // === Fetch Pickup & Drop Coordinates ===
   useEffect(() => {
-    const fetchCoords = async () => {
-      if (pickup) {
-        const coords = await geocode(pickup);
-        setPickupCoords(coords);
-      }
-      if (drop) {
-        const coords = await geocode(drop);
-        setDropCoords(coords);
-      }
-    };
-    fetchCoords();
+    if (pickup && drop) {
+      setPickupCoords([pickup.lat, pickup.lng]);
+      setDropCoords([drop.lat, drop.lng]);
+    }
   }, [pickup, drop]);
 
-  // === Fetch Nearby Riders & Setup Map ===
   useEffect(() => {
-    const fetchNearbyRiders = async (pickupCoords) => {
+    const fetchNearbyRiders = async () => {
       try {
         const res = await axios.post("https://green-wayb.onrender.com/nearby-riders", {
           userLocation: { lat: pickupCoords[0], lng: pickupCoords[1] },
@@ -78,11 +74,8 @@ const Finding = () => {
           radius: 5,
           userJourneyDate: journeyDate,
         });
-
-        console.log("Nearby riders response:", res.data);
         return res.data.riders || [];
-      } catch (err) {
-        console.error("Error fetching nearby riders:", err);
+      } catch {
         return [];
       }
     };
@@ -96,20 +89,16 @@ const Finding = () => {
       }
 
       mapRef.current = L.map(mapContainerRef.current).setView(pickupCoords, 11);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "GreenWay",
-      }).addTo(mapRef.current);
 
-      // Markers
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapRef.current);
+
       L.marker(pickupCoords, {
         icon: L.icon({
           iconUrl: "/finder.png",
           iconSize: [60, 60],
           iconAnchor: [30, 60],
         }),
-      })
-        .addTo(mapRef.current)
-        .bindPopup("Pickup Point");
+      }).addTo(mapRef.current);
 
       L.marker(dropCoords, {
         icon: L.icon({
@@ -117,36 +106,37 @@ const Finding = () => {
           iconSize: [40, 50],
           iconAnchor: [20, 50],
         }),
-      })
-        .addTo(mapRef.current)
-        .bindPopup("Destination");
+      }).addTo(mapRef.current);
 
-      // Route Curve
       const midLat = (pickupCoords[0] + dropCoords[0]) / 2;
       const midLng = (pickupCoords[1] + dropCoords[1]) / 2;
       const offsetLat = (dropCoords[0] - pickupCoords[0]) * 0.3;
       const offsetLng = (dropCoords[1] - pickupCoords[1]) * 0.3;
+
       const curvePoint = [midLat + offsetLng, midLng - offsetLat];
+
       const curvePoints = [];
       for (let t = 0; t <= 1; t += 0.05) {
         const lat =
           (1 - t) * (1 - t) * pickupCoords[0] +
           2 * (1 - t) * t * curvePoint[0] +
           t * t * dropCoords[0];
+
         const lng =
           (1 - t) * (1 - t) * pickupCoords[1] +
           2 * (1 - t) * t * curvePoint[1] +
           t * t * dropCoords[1];
+
         curvePoints.push([lat, lng]);
       }
+
       L.polyline(curvePoints, {
-        color: "#444141",
-        weight: 2,
-        opacity: 1.0,
+        color: "#374151",
+        weight: 3,
+        dashArray: "10, 10"
       }).addTo(mapRef.current);
 
-      // Add riders
-      const riders = await fetchNearbyRiders(pickupCoords);
+      const riders = await fetchNearbyRiders();
       setNearbyRiders(riders);
       setLoading(false);
 
@@ -163,7 +153,7 @@ const Finding = () => {
       });
 
       const bounds = L.latLngBounds([pickupCoords, dropCoords]);
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      mapRef.current.fitBounds(bounds);
     };
 
     setupMap();
@@ -178,72 +168,92 @@ const Finding = () => {
 
   return (
     <div className={styles.main}>
+      <style>{`
+        .animated-route {
+          animation: route-dash 1s linear infinite;
+        }
+        @keyframes route-dash {
+          to {
+            stroke-dashoffset: -20;
+          }
+        }
+      `}</style>
       <div className={styles.left}>
-        <div className={styles.mapHeader}>
-          <h2 className={styles.heading}>Live Location Tracking</h2>
-          <div className={styles.statusContainer}>
-            <div className={styles.statusIndicator}>
-              <div className={styles.pulse}></div>
-            </div>
-            <span className={styles.statusText}>Live</span>
-          </div>
-        </div>
         <div className={styles.mapContainer}>
-          <div ref={mapContainerRef} id="map" className={styles.map} />
+          <div ref={mapContainerRef} className={styles.map} />
         </div>
       </div>
 
       <div className={styles.right}>
         <div className={styles.driversHeader}>
-          <h3 className={styles.driversTitle}>Available Drivers</h3>
-          <div className={styles.driversCount}>
+          <h3>Available Drivers</h3>
+          <div>
             {loading
               ? "Loading..."
-              : `${nearbyRiders.length} driver${nearbyRiders.length !== 1 ? "s" : ""} nearby`}
+              : `${nearbyRiders.length} driver${nearbyRiders.length !== 1 ? "s" : ""}`}
           </div>
         </div>
 
         <div className={styles.driversList}>
-          {loading && <div className={styles.noDrivers}>Fetching nearby drivers...</div>}
+          {loading && <div>Loading drivers...</div>}
+
           {!loading && nearbyRiders.length === 0 && (
-            <div className={styles.noDrivers}>No nearby drivers available 🚗</div>
+            <div>No drivers available</div>
           )}
 
           {nearbyRiders.map((rider, index) => (
-            <div key={index} className={styles.driverCard}>
-              <div className={styles.driverHeader}>
-                <div className={styles.driverImageContainer}>
-                  <img
-                    src={rider.picture || "/pic.jpg"}
-                    alt={rider.name}
-                    className={styles.driverImage}
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className={styles.onlineIndicator}></div>
+            <div key={index} className={styles.driverCard} style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)', backgroundColor: 'white', border: '1px solid #e5e7eb', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <img src={rider.picture || "/pic.jpg"} alt="" style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#111827' }}>{rider.name}</h4>
+                    <div style={{ display: 'flex', alignItems: 'center', color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>
+                      <Star size={14} color="#f59e0b" fill="#f59e0b" style={{ marginRight: '4px' }} /> 4.8
+                    </div>
+                  </div>
                 </div>
-                <div className={styles.driverBasicInfo}>
-                  <h4 className={styles.driverName}>{rider.name}</h4>
-                  <div className={styles.driverRating}>★★★★★</div>
-                </div>
-                <div className={styles.driverPrice}>
-                  <MdCurrencyRupee className={styles.icon} />
+                <div style={{ display: 'flex', alignItems: 'center', fontSize: '18px', fontWeight: 'bold', color: '#059669' }}>
+                  <IndianRupee size={18} />
                   {rider.price}
                 </div>
               </div>
 
-              <div className={styles.driverDetails}>
-                <div className={styles.routeInfo}>
-                  <div>🚀 From: {rider.pickup}</div>
-                  <div>🎯 To: {rider.drop}</div>
-                  <div>🚗 Car: {rider.carModel}</div>
-                  <div>💺 Seats: {rider.seats}</div>
-                  <div>🔢 No: {rider.carnumber}</div>
+              <div style={{ backgroundColor: '#f9fafb', padding: '12px', borderRadius: '8px', fontSize: '14px', color: '#4b5563' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <MapPin size={16} color="#3b82f6" />
+                  <span style={{ fontWeight: '500', color: '#1f2937' }}>{pickup.name}</span>
+                  <ArrowRight size={14} color="#9ca3af" />
+                  <span style={{ fontWeight: '500', color: '#1f2937' }}>{drop.name}</span>
                 </div>
 
-                <button className={styles.bookButton} onClick={() => handleBooking(rider)}>
-                  Book Ride
-                </button>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Car size={16} color="#6b7280" /> {rider.carModel}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Users size={16} color="#6b7280" /> {rider.seats} seats
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Hash size={16} color="#6b7280" /> {rider.carNumber}
+                  </div>
+                </div>
               </div>
+
+              <button
+                onClick={() => handleBooking(rider)}
+                disabled={bookingLoading}
+                style={{
+                  width: '100%', padding: '10px 0', borderRadius: '8px', border: 'none',
+                  backgroundColor: '#059669', color: 'white', fontWeight: '600', fontSize: '15px',
+                  cursor: bookingLoading ? 'not-allowed' : 'pointer', opacity: bookingLoading ? 0.7 : 1,
+                  marginTop: '4px', transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => { if (!bookingLoading) e.currentTarget.style.backgroundColor = '#047857'; }}
+                onMouseOut={(e) => { if (!bookingLoading) e.currentTarget.style.backgroundColor = '#059669'; }}
+              >
+                {bookingLoading ? "Booking..." : "Book Ride"}
+              </button>
             </div>
           ))}
         </div>

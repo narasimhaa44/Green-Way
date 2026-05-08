@@ -8,12 +8,22 @@ const FinderSchema = new mongoose.Schema({
     provider: { type: String, default: "" },
     lastLogin: { type: Date, default: Date.now },
 
-    // Journey Info
     pickup: { type: String, default: "" },
     drop: { type: String, default: "" },
-    journeyDate: { type: Date },        // Updated from 'date' to reflect the journey
-    price:{type:String,defualt:""},
-    // Additional fields from the form
+
+    // 🔥 ADD THIS (VERY IMPORTANT)
+    pickupLocation: {
+        lat: Number,
+        lng: Number
+    },
+    dropLocation: {
+        lat: Number,
+        lng: Number
+    },
+
+    journeyDate: { type: Date },
+
+    price: { type: String, default: "" },
     carModel: { type: String, default: "" },
     seatsAvailable: { type: Number, default: 1 },
     carNumber: { type: String, default: "" },

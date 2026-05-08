@@ -22,7 +22,8 @@ const Login = () => {
         password
       });
       console.log(res.data);
-      navigate(`/findR?email=${encodeURIComponent(email)}`);
+      localStorage.setItem("user", JSON.stringify(res.data));
+      navigate("/");
     } catch (err) {
       console.error("Login failed:", err);
       // Display a user-friendly error message
@@ -32,18 +33,18 @@ const Login = () => {
 
   return (
     <div>
-      <img src="/logo.png" alt="logo" className={styles.logo}/>
+      <img src="/logo.png" alt="logo" className={styles.logo} />
       <div className={styles.outer}>
         <p className={styles.para}>Login in with Google</p>
-                {error && (
+        {error && (
           <div
             style={{
-              backgroundColor: "#f44336", 
+              backgroundColor: "#f44336",
               color: "white",
-              opacity:"0.7",
+              opacity: "0.7",
               padding: "10px",
-              width:"400px",
-              marginLeft:"30px",
+              width: "400px",
+              marginLeft: "30px",
               borderRadius: "5px",
               marginBottom: "10px",
               textAlign: "center",

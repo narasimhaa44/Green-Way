@@ -10,15 +10,17 @@ import { LuCar } from "react-icons/lu";
 import { IoPeople } from "react-icons/io5";
 import { MdCurrencyRupee } from "react-icons/md";
 const From = () => {
-  const [pickup, setPickup] = useState("");
-  const [drop, setDrop] = useState("");
+  const [pickup, setPickup] = useState(null);
+  const [drop, setDrop] = useState(null);
   const [journeyDate, setJourneyDate] = useState("");
   const [carModel, setCarModel] = useState("");
   const [seatsAvailable, setSeatsAvailable] = useState("");
   const [carNumber, setCarNumber] = useState("");
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [dropSuggestions, setDropSuggestions] = useState([]);
-  const [Cost,setCost]=useState([]);
+  const [Cost, setCost] = useState("");
+  const [pickupInput, setPickupInput] = useState("");
+  const [dropInput, setDropInput] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,29 +53,74 @@ const From = () => {
   }, []);
 
   const fetchSuggestions = async (query, type) => {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`;
+    if (query.length < 2) return;
+
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-      type === "pickup" ? setPickupSuggestions(data) : setDropSuggestions(data);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`
+      );
+
+      const data = await res.json();
+
+      const formatted = data.features.map((item) => ({
+        place_id: item.properties.osm_id,
+        display_name: [
+          item.properties.name,
+          item.properties.city,
+          item.properties.state,
+          item.properties.country
+        ].filter(Boolean).join(", "),
+        lat: item.geometry.coordinates[1],
+        lon: item.geometry.coordinates[0],
+      }));
+
+      if (type === "pickup") {
+        setPickupSuggestions(formatted);
+      } else {
+        setDropSuggestions(formatted);
+      }
+
+    } catch (err) {
+      console.error(err);
     }
   };
 
+
+  // const handleSelect = (item, type) => {
+  //   type === "pickup" ? setPickup(item.display_name) : setDrop(item.display_name);
+  //   type === "pickup" ? setPickupSuggestions([]) : setDropSuggestions([]);
+  // };
   const handleSelect = (item, type) => {
-    type === "pickup" ? setPickup(item.display_name) : setDrop(item.display_name);
-    type === "pickup" ? setPickupSuggestions([]) : setDropSuggestions([]);
+    const locationData = {
+      name: item.display_name,
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon)
+    };
+    if (type === "pickup") {
+      setPickup(locationData);
+      setPickupInput(locationData.name);
+      setPickupSuggestions([]);
+    } else {
+      setDrop(locationData);
+      setDropInput(locationData.name);
+      setDropSuggestions([]);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = localStorage.getItem("userEmail");
+    const user = JSON.parse(localStorage.getItem("user"));
+    const email = user?.email;
+    console.log(email);
 
     try {
       const response = await axios.post("https://green-wayb.onrender.com/update1", {
-        pickup,
-        drop,
+        pickup: pickup.name,
+        drop: drop.name,
+        pickupLat: pickup.lat,
+        pickupLng: pickup.lng,
+        dropLat: drop.lat,
+        dropLng: drop.lng,
         journeyDate,
         carModel,
         seatsAvailable,
@@ -84,7 +131,7 @@ const From = () => {
 
       console.log("Response:", response.data);
       navigate("/Riding", {
-        state: { email,pickup, drop, journeyDate, carModel, seatsAvailable, carNumber,Cost },
+        state: { email, pickup, drop, journeyDate, carModel, seatsAvailable, carNumber, Cost },
       });
     } catch (error) {
       console.error("Error sending data:", error);
@@ -104,7 +151,7 @@ const From = () => {
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
               <label className={styles.label}><GoLocation className={styles.icon} /> Your Location</label>
-              <input type="text" value={pickup} onChange={(e) => setPickup(e.target.value)} placeholder="Enter your location" className={styles.input} />
+              <input type="text" value={pickupInput} onChange={(e) => { setPickupInput(e.target.value); fetchSuggestions(e.target.value, "pickup"); }} placeholder="Enter your location" className={styles.input} />
               {pickupSuggestions.length > 0 && (
                 <ul className={styles.suggestions}>
                   {pickupSuggestions.map((item) => (
@@ -118,7 +165,7 @@ const From = () => {
 
             <div className={styles.inputGroup}>
               <label className={styles.label}><MdMyLocation className={styles.icon} /> Your Destination</label>
-              <input type="text" value={drop} onChange={(e) => setDrop(e.target.value)} placeholder="Enter drop location" className={styles.input} />
+              <input type="text" value={dropInput} onChange={(e) => { setDropInput(e.target.value); fetchSuggestions(e.target.value, "drop"); }} placeholder="Enter drop location" className={styles.input} />
               {dropSuggestions.length > 0 && (
                 <ul className={styles.suggestions}>
                   {dropSuggestions.map((item) => (
@@ -150,7 +197,7 @@ const From = () => {
               <input type="text" className={styles.input} value={carNumber} placeholder="Enter Your Car Number" onChange={(e) => setCarNumber(e.target.value)} />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Price(<MdCurrencyRupee  className={styles.icon} />)</label>
+              <label className={styles.label}>Price(<MdCurrencyRupee className={styles.icon} />)</label>
               <input type="text" className={styles.input} value={Cost} placeholder="Enter Your Car Number" onChange={(e) => setCost(e.target.value)} />
             </div>
 
@@ -159,7 +206,7 @@ const From = () => {
         </div>
 
         <div className={styles.right}>
-          <img src="/from.jpg"  alt="Find Route" className={styles.find} />
+          <img src="/from.jpg" alt="Find Route" className={styles.find} />
         </div>
       </div>
     </div>

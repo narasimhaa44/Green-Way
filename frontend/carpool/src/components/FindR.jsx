@@ -1,4 +1,3 @@
-// Find.js
 import React, { useState, useEffect } from "react";
 import styles from "./FindR.module.css";
 import { MdMyLocation } from "react-icons/md";
@@ -8,11 +7,13 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
 const FindR = () => {
-  const [pickup, setPickup] = useState("");
-  const [drop, setDrop] = useState("");
+  const [pickup, setPickup] = useState(null);
+  const [drop, setDrop] = useState(null);
   const [journeyDate, setJourneyDate] = useState(""); // ⬅️ NEW STATE
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [dropSuggestions, setDropSuggestions] = useState([]);
+  const [pickupInput, setPickupInput] = useState("");
+  const [dropInput, setDropInput] = useState("");
   const navigate = useNavigate();
 
   // Fetch suggestions for pickup
@@ -32,71 +33,77 @@ const FindR = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [drop]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const emailFromUrl = params.get("email");
-    if (emailFromUrl) {
-      localStorage.setItem("userEmail", emailFromUrl);
-    } else {
-      axios
-        .get("https://green-wayb.onrender.com/me", { withCredentials: true })
-        .then((res) => {
-          if (res.data.email) {
-            localStorage.setItem("userEmail", res.data.email);
-          }
-        })
-        .catch((err) => {
-          console.warn("❌ No active session:", err.response?.data || err.message);
-        });
-    }
-  }, []);
-
-  // API call to OpenStreetMap
   const fetchSuggestions = async (query, type) => {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-      query
-    )}&addressdetails=1&limit=5`;
+    if (query.length < 2) return;
 
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-      type === "pickup"
-        ? setPickupSuggestions(data)
-        : setDropSuggestions(data);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
+      const res = await fetch(
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`
+      );
+
+      const data = await res.json();
+
+      const formatted = data.features.map((item) => ({
+        place_id: item.properties.osm_id,
+        display_name: [
+          item.properties.name,
+          item.properties.city,
+          item.properties.state,
+          item.properties.country
+        ].filter(Boolean).join(", "),
+        lat: item.geometry.coordinates[1],
+        lon: item.geometry.coordinates[0],
+      }));
+
+      if (type === "pickup") {
+        setPickupSuggestions(formatted);
+      } else {
+        setDropSuggestions(formatted);
+      }
+    } catch (err) {
+      console.error("Photon API error:", err);
     }
   };
 
-  // Handle suggestion select
   const handleSelect = (item, type) => {
+    const locationData = {
+      name: item.display_name,
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon)
+    };
     if (type === "pickup") {
-      setPickup(item.display_name);
+      setPickup(locationData);
+      setPickupInput(locationData.name);
       setPickupSuggestions([]);
     } else {
-      setDrop(item.display_name);
+      setDrop(locationData);
+      setDropInput(locationData.name);
       setDropSuggestions([]);
     }
   };
 
-  // Submit pickup/drop/date to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const email = localStorage.getItem("userEmail"); // ⬅️ stored earlier
+      const user = JSON.parse(localStorage.getItem("user"));
+      const email = user?.email;
 
-      const response = await axios.post("https://green-wayb.onrender.com/update", {
-        pickup,
-        drop,
-        journeyDate, // ⬅️ send date also
+      if (!email) {
+        alert("User not logged in");
+        navigate("/login");
+        return;
+      }
+
+      await axios.post("https://green-wayb.onrender.com/update", {
+        pickup: pickup?.name,
+        drop: drop?.name,
+        journeyDate,
         email,
       });
 
-      console.log("Response from backend:", response.data);
-navigate("/Finding", { state: { pickup, drop, journeyDate } });
-      navigate("/Finding", {state: { pickup, drop, journeyDate,email }});
+      navigate("/Finding", { state: { pickup, drop, journeyDate, email } });
+
     } catch (error) {
       console.error("Error sending data:", error);
     }
@@ -123,8 +130,8 @@ navigate("/Finding", { state: { pickup, drop, journeyDate } });
               </label>
               <input
                 type="text"
-                value={pickup}
-                onChange={(e) => setPickup(e.target.value)}
+                value={pickupInput}
+                onChange={(e) => { setPickupInput(e.target.value); fetchSuggestions(e.target.value, "pickup"); }}
                 placeholder="Enter your location"
                 className={styles.input}
               />
@@ -150,8 +157,8 @@ navigate("/Finding", { state: { pickup, drop, journeyDate } });
               </label>
               <input
                 type="text"
-                value={drop}
-                onChange={(e) => setDrop(e.target.value)}
+                value={dropInput}
+                onChange={(e) => { setDropInput(e.target.value); fetchSuggestions(e.target.value, "drop"); }}
                 placeholder="Enter drop location"
                 className={styles.input}
               />
