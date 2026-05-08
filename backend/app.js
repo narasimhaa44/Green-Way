@@ -73,20 +73,167 @@ const sendEmail = async (to, subject, html) => {
 };
 
 // ================= BOOKING =================
+// app.post("/booking", async (req, res) => {
+//   const { userEmail, riderEmail, pickup, drop, journeyDate, price } = req.body;
+
+//   try {
+//     if (!userEmail || !riderEmail || !pickup || !drop || !journeyDate || !price) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
+
+//     const rider = await Finder.findOne({ email: riderEmail });
+//     const user = await User.findOne({ email: userEmail });
+//     if (new Date(journeyDate) < new Date()) {
+//       return res.status(400).json({ message: "Cannot book past ride" });
+//     }
+//     // ✅ FIX 1
+//     if (!rider || !user) {
+//       return res.status(404).json({ message: "User/Rider not found" });
+//     }
+
+//     if (rider.seatsAvailable <= 0) {
+//       return res.status(400).json({ message: "No seats available" });
+//     }
+
+//     // ✅ FIX 2
+//     const existing = await Booking.findOne({
+//       userEmail,
+//       riderEmail,
+//       journeyDate,
+//       status: { $in: ["pending", "confirmed"] }
+//     });
+
+//     if (existing) {
+//       return res.status(400).json({ message: "Ride already booked" });
+//     }
+
+//     const booking = new Booking({
+//       userEmail,
+//       riderEmail,
+//       pickup,
+//       drop,
+//       journeyDate,
+//       price,
+//       status: "pending",
+//     });
+
+//     await booking.save();
+
+//     await Promise.all([
+//       sendEmail(
+//         riderEmail,
+//         "🚗 New Ride Request",
+//         `
+//         <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+//           <div style="max-width:500px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+      
+//             <div style="background:#059669; color:white; padding:16px; text-align:center;">
+//               <h2 style="margin:0;">New Ride Request 🚗</h2>
+//             </div>
+      
+//             <div style="padding:20px;">
+//               <p style="font-size:16px;">Hi <b>${user.name}</b>,</p>
+      
+//               <p style="color:#555;">
+//                 You have received a new ride request from a user.
+//               </p>
+      
+//               <div style="background:#f9fafb; padding:15px; border-radius:10px; margin:15px 0;">
+//                 <p><b>Route:</b> ${pickup} → ${drop}</p>
+//                 <p><b>Date:</b> ${new Date(journeyDate).toLocaleString()}</p>
+//                 <p><b>Passenger:</b> ${user.name}</p>
+//               </div>
+      
+//               <p style="color:#555;">
+//                 Please log in to your dashboard to accept or reject the request.
+//               </p>
+      
+//               <div style="text-align:center; margin-top:20px;">
+//                 <a href="https://green-way.onrender.com"
+//                    style="background:#059669; color:white; padding:10px 20px; text-decoration:none; border-radius:6px;">
+//                    View Request
+//                 </a>
+//               </div>
+//             </div>
+      
+//             <div style="background:#f1f5f9; padding:10px; text-align:center; font-size:12px; color:#888;">
+//               Carpool App • Safe & Smart Travel
+//             </div>
+      
+//           </div>
+//         </div>
+//         `
+//       ),
+//       sendEmail(
+//         userEmail,
+//         "📩 Ride Request Sent",
+//         `
+//         <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+//           <div style="max-width:500px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+      
+//             <div style="background:#3b82f6; color:white; padding:16px; text-align:center;">
+//               <h2 style="margin:0;">Ride Request Sent 🚀</h2>
+//             </div>
+      
+//             <div style="padding:20px;">
+//               <p style="font-size:16px;">Hi <b>${user.name}</b>,</p>
+      
+//               <p style="color:#555;">
+//                 Your ride request has been successfully sent to the driver.
+//               </p>
+      
+//               <div style="background:#f9fafb; padding:15px; border-radius:10px; margin:15px 0;">
+//                 <p><b>Route:</b> ${pickup} → ${drop}</p>
+//                 <p><b>Date:</b> ${new Date(journeyDate).toLocaleString()}</p>
+//                 <p><b>Status:</b> Waiting for driver confirmation ⏳</p>
+//               </div>
+      
+//               <p style="color:#555;">
+//                 You will be notified once the driver accepts your request.
+//               </p>
+      
+//               <div style="text-align:center; margin-top:20px;">
+//                 <a href="https://green-way.onrender.com"
+//                    style="background:#3b82f6; color:white; padding:10px 20px; text-decoration:none; border-radius:6px;">
+//                    View My Rides
+//                 </a>
+//               </div>
+//             </div>
+      
+//             <div style="background:#f1f5f9; padding:10px; text-align:center; font-size:12px; color:#888;">
+//               Carpool App • Travel smarter together
+//             </div>
+      
+//           </div>
+//         </div>
+//         `
+//       ),
+//     ]);
+
+//     res.json({ message: "Booking successful", booking });
+
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Booking failed" });
+//   }
+// });
+
 app.post("/booking", async (req, res) => {
   const { userEmail, riderEmail, pickup, drop, journeyDate, price } = req.body;
 
   try {
+    // ✅ VALIDATION
     if (!userEmail || !riderEmail || !pickup || !drop || !journeyDate || !price) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const rider = await Finder.findOne({ email: riderEmail });
-    const user = await User.findOne({ email: userEmail });
     if (new Date(journeyDate) < new Date()) {
       return res.status(400).json({ message: "Cannot book past ride" });
     }
-    // ✅ FIX 1
+
+    const rider = await Finder.findOne({ email: riderEmail });
+    const user = await User.findOne({ email: userEmail });
+
     if (!rider || !user) {
       return res.status(404).json({ message: "User/Rider not found" });
     }
@@ -95,7 +242,6 @@ app.post("/booking", async (req, res) => {
       return res.status(400).json({ message: "No seats available" });
     }
 
-    // ✅ FIX 2
     const existing = await Booking.findOne({
       userEmail,
       riderEmail,
@@ -107,6 +253,7 @@ app.post("/booking", async (req, res) => {
       return res.status(400).json({ message: "Ride already booked" });
     }
 
+    // ✅ CREATE BOOKING
     const booking = new Booking({
       userEmail,
       riderEmail,
@@ -119,106 +266,48 @@ app.post("/booking", async (req, res) => {
 
     await booking.save();
 
-    await Promise.all([
-      sendEmail(
-        riderEmail,
-        "🚗 New Ride Request",
-        `
-        <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
-          <div style="max-width:500px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
-      
-            <div style="background:#059669; color:white; padding:16px; text-align:center;">
-              <h2 style="margin:0;">New Ride Request 🚗</h2>
-            </div>
-      
-            <div style="padding:20px;">
-              <p style="font-size:16px;">Hi <b>${user.name}</b>,</p>
-      
-              <p style="color:#555;">
-                You have received a new ride request from a user.
-              </p>
-      
-              <div style="background:#f9fafb; padding:15px; border-radius:10px; margin:15px 0;">
-                <p><b>Route:</b> ${pickup} → ${drop}</p>
-                <p><b>Date:</b> ${new Date(journeyDate).toLocaleString()}</p>
-                <p><b>Passenger:</b> ${user.name}</p>
-              </div>
-      
-              <p style="color:#555;">
-                Please log in to your dashboard to accept or reject the request.
-              </p>
-      
-              <div style="text-align:center; margin-top:20px;">
-                <a href="https://green-way.onrender.com"
-                   style="background:#059669; color:white; padding:10px 20px; text-decoration:none; border-radius:6px;">
-                   View Request
-                </a>
-              </div>
-            </div>
-      
-            <div style="background:#f1f5f9; padding:10px; text-align:center; font-size:12px; color:#888;">
-              Carpool App • Safe & Smart Travel
-            </div>
-      
-          </div>
-        </div>
-        `
-      ),
-      sendEmail(
-        userEmail,
-        "📩 Ride Request Sent",
-        `
-        <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
-          <div style="max-width:500px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
-      
-            <div style="background:#3b82f6; color:white; padding:16px; text-align:center;">
-              <h2 style="margin:0;">Ride Request Sent 🚀</h2>
-            </div>
-      
-            <div style="padding:20px;">
-              <p style="font-size:16px;">Hi <b>${user.name}</b>,</p>
-      
-              <p style="color:#555;">
-                Your ride request has been successfully sent to the driver.
-              </p>
-      
-              <div style="background:#f9fafb; padding:15px; border-radius:10px; margin:15px 0;">
-                <p><b>Route:</b> ${pickup} → ${drop}</p>
-                <p><b>Date:</b> ${new Date(journeyDate).toLocaleString()}</p>
-                <p><b>Status:</b> Waiting for driver confirmation ⏳</p>
-              </div>
-      
-              <p style="color:#555;">
-                You will be notified once the driver accepts your request.
-              </p>
-      
-              <div style="text-align:center; margin-top:20px;">
-                <a href="https://green-way.onrender.com"
-                   style="background:#3b82f6; color:white; padding:10px 20px; text-decoration:none; border-radius:6px;">
-                   View My Rides
-                </a>
-              </div>
-            </div>
-      
-            <div style="background:#f1f5f9; padding:10px; text-align:center; font-size:12px; color:#888;">
-              Carpool App • Travel smarter together
-            </div>
-      
-          </div>
-        </div>
-        `
-      ),
-    ]);
+    // =========================
+    // 🔥 EMAIL WITH TIMEOUT FIX
+    // =========================
 
+    const sendWithTimeout = (promise, ms = 5000) => {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Email timeout")), ms)
+        ),
+      ]);
+    };
+
+    try {
+      await Promise.all([
+        sendWithTimeout(
+          sendEmail(
+            riderEmail,
+            "🚗 New Ride Request",
+            `<p>${user.name} booked your ride</p>`
+          )
+        ),
+        sendWithTimeout(
+          sendEmail(
+            userEmail,
+            "📩 Ride Request Sent",
+            `<p>${pickup} → ${drop}</p>`
+          )
+        )
+      ]);
+    } catch (err) {
+      console.log("⚠️ Email skipped:", err.message);
+    }
+
+    // ✅ FINAL RESPONSE
     res.json({ message: "Booking successful", booking });
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Booking failed" });
+    console.log("❌ ERROR:", err);
+    res.status(500).json({ message: "Booking failed", error: err.message });
   }
 });
-
-
 
 app.post("/booking/accept/:id", async (req, res) => {
   const { role } = req.body;
