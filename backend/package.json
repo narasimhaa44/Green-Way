@@ -6,7 +6,7 @@
     "start": "node app.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@getbrevo/brevo": "^3.0.1",
@@ -25,8 +25,11 @@
     "passport-google-oauth20": "^2.0.0",
     "resend": "^6.4.1",
     "socket.io": "^4.7.5",
-    "ws": "^8.17.0",
+    "ws": "8.17.0",
     "uuid": "^11.1.0"
+  },
+  "overrides": {
+    "ws": "8.17.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
